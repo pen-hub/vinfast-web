@@ -9,6 +9,7 @@ import { getAllBranches, getBranchByShowroomName } from '../data/branchData';
 import { loadPromotionsFromFirebase, defaultPromotions, filterPromotionsByDongXe } from '../data/promotionsData';
 import CurrencyInput from '../components/shared/CurrencyInput';
 import { generateVSO } from '../utils/vsoGenerator';
+import { isValidCCCD, isValidPhone, validateRequiredFields } from '../utils/validation';
 
 export default function ContractFormPage() {
   const navigate = useNavigate();
@@ -623,16 +624,34 @@ export default function ContractFormPage() {
   };
 
   const handleSubmit = async () => {
-    // Validation
-    if (!contract.customerName || !contract.phone || !contract.email) {
-      toast.error("Vui lòng điền tên khách hàng, số điện thoại và email!");
+    // Required fields validation
+    const requiredFields = ['customerName', 'phone', 'cccd', 'address', 'model'];
+    const validation = validateRequiredFields(contract, requiredFields);
+
+    if (!validation.valid) {
+      const fieldNames = {
+        customerName: 'Tên khách hàng',
+        phone: 'Số điện thoại',
+        cccd: 'CCCD',
+        address: 'Địa chỉ',
+        model: 'Dòng xe'
+      };
+      const missingNames = validation.missing.map(f => fieldNames[f] || f);
+      toast.error(`Vui lòng điền: ${missingNames.join(', ')}`);
       return;
     }
 
-    // Debug: Log contract data before saving
-    console.log("Contract data before saving:", contract);
-    console.log("Loan amount:", contract.loanAmount);
-    console.log("Payment method:", contract.payment);
+    // CCCD format validation (12 digits)
+    if (contract.cccd && !isValidCCCD(contract.cccd)) {
+      toast.error('CCCD không hợp lệ. Vui lòng nhập đúng 12 chữ số.');
+      return;
+    }
+
+    // Phone format validation (VN format)
+    if (!isValidPhone(contract.phone)) {
+      toast.error('Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng VN.');
+      return;
+    }
 
     try {
       const safeValue = (val) => val !== undefined && val !== null ? val : "";
