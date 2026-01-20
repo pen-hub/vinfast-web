@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { getBranchByShowroomName, getDefaultBranch } from "../../data/branchData";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
@@ -119,6 +120,37 @@ const GiayXacNhan = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  // Validate required fields before printing
+  const validateBeforePrint = () => {
+    const requiredFields = [
+      { value: data?.customerName, label: "Tên khách hàng" },
+      { value: data?.cccd, label: "Số CCCD" },
+      { value: data?.phone, label: "Số điện thoại" },
+      { value: data?.model, label: "Dòng xe" },
+    ];
+
+    const missingFields = requiredFields.filter(field => !field.value || field.value.trim() === "");
+
+    if (missingFields.length > 0) {
+      const fieldNames = missingFields.map(f => f.label).join(", ");
+      toast.error(`Thiếu thông tin bắt buộc: ${fieldNames}`);
+      return false;
+    }
+
+    if (!branch) {
+      toast.error("Chưa chọn showroom. Vui lòng quay lại và chọn showroom.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handlePrint = () => {
+    if (validateBeforePrint()) {
+      window.print();
+    }
   };
 
   if (loading) {
@@ -367,7 +399,7 @@ const GiayXacNhan = () => {
             Quay lại
           </button>
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
           >
             In Giấy Xác Nhận
