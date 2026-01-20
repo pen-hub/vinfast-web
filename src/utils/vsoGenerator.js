@@ -1,42 +1,102 @@
 import { ref, get, set, runTransaction } from 'firebase/database';
 import { database } from '../firebase/config';
+import { isValidMaDms } from './validation';
+
+// ============================================
+// CONSTANTS
+// ============================================
+
+/** Maximum sequence number before overflow (9999) */
+const MAX_SEQUENCE = 9999;
+
+/** Transaction timeout in milliseconds (10 seconds) */
+const TRANSACTION_TIMEOUT = 10000;
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Generate a unique fallback sequence using timestamp + random
+ * Reduces collision probability compared to Date.now() % 10000
+ * @returns {string} 4-digit padded sequence
+ */
+const generateFallbackSequence = () => {
+  const timestamp = Date.now() % 10000;
+  const random = Math.floor(Math.random() * 100);
+  const combined = (timestamp + random) % 10000;
+  return String(combined).padStart(4, '0');
+};
+
+/**
+ * Wrap a promise with timeout
+ * @param {Promise} promise - Promise to wrap
+ * @param {number} ms - Timeout in milliseconds
+ * @returns {Promise} Promise that rejects on timeout
+ */
+const withTimeout = (promise, ms) => {
+  const timeout = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Transaction timeout')), ms);
+  });
+  return Promise.race([promise, timeout]);
+};
+
+// ============================================
+// MAIN FUNCTIONS
+// ============================================
 
 /**
  * Generate VSO number with format: {maDms}-VSO-{YY}-{MM}-{sequence}
  * Example: S00901-VSO-25-12-0035
- * 
+ *
+ * Edge cases handled:
+ * - maDms format validation (S followed by 5 digits)
+ * - Transaction timeout (10 seconds)
+ * - Sequence overflow (> 9999 uses 5 digits)
+ * - Fallback sequence with reduced collision risk
+ *
  * @param {string} maDms - Branch code (e.g., S00901, S00501, S41501)
  * @returns {Promise<string>} Generated VSO number
+ * @throws {Error} If maDms is missing or invalid format
  */
 export const generateVSO = async (maDms) => {
+  // Validate maDms format
   if (!maDms) {
     throw new Error('maDms is required');
+  }
+  if (!isValidMaDms(maDms)) {
+    throw new Error(`Invalid maDms format: ${maDms}. Expected format: S00XXX`);
   }
 
   const now = new Date();
   const year = String(now.getFullYear()).slice(-2); // Last 2 digits: 25
   const month = String(now.getMonth() + 1).padStart(2, '0'); // 01-12
-  
+
   // Key for sequence counter: e.g., "S00901-25-12"
   const sequenceKey = `${maDms}-${year}-${month}`;
   const counterRef = ref(database, `vsoCounters/${sequenceKey}`);
 
   try {
-    // Use transaction to safely increment counter
-    const result = await runTransaction(counterRef, (currentValue) => {
+    // Use transaction with timeout to safely increment counter
+    const transactionPromise = runTransaction(counterRef, (currentValue) => {
       return (currentValue || 0) + 1;
     });
 
+    const result = await withTimeout(transactionPromise, TRANSACTION_TIMEOUT);
+
     if (result.committed) {
-      const sequence = String(result.snapshot.val()).padStart(4, '0');
+      const sequenceNum = result.snapshot.val();
+      // Handle sequence overflow: use appropriate padding
+      const padLength = sequenceNum > MAX_SEQUENCE ? 5 : 4;
+      const sequence = String(sequenceNum).padStart(padLength, '0');
       return `${maDms}-VSO-${year}-${month}-${sequence}`;
     } else {
       throw new Error('Transaction failed');
     }
   } catch (error) {
     console.error('Error generating VSO:', error);
-    // Fallback: use timestamp-based sequence
-    const fallbackSequence = String(Date.now() % 10000).padStart(4, '0');
+    // Fallback: use timestamp + random to reduce collision
+    const fallbackSequence = generateFallbackSequence();
     return `${maDms}-VSO-${year}-${month}-${fallbackSequence}`;
   }
 };
