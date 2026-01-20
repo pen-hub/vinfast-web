@@ -3,6 +3,7 @@ const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {onRequest} = require("firebase-functions/v2/https");
 const {initializeApp} = require("firebase-admin/app");
 const {getDatabase} = require("firebase-admin/database");
+const {getAuth} = require("firebase-admin/auth");
 const {defineString} = require("firebase-functions/params");
 const {google} = require("googleapis");
 
@@ -245,6 +246,7 @@ exports.dailySummary = onSchedule(
 /**
  * HTTP endpoint to manually trigger sync
  * Usage: GET /syncToSheets?contractId=xxx
+ * Requires: Authorization header with Bearer token
  */
 exports.syncToSheets = onRequest(
   {
@@ -252,6 +254,23 @@ exports.syncToSheets = onRequest(
     cors: true,
   },
   async (req, res) => {
+    // Verify Firebase ID token
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      console.warn("syncToSheets: Missing authorization header");
+      res.status(401).json({error: "Missing authorization header"});
+      return;
+    }
+
+    const idToken = authHeader.split("Bearer ")[1];
+    try {
+      await getAuth().verifyIdToken(idToken);
+    } catch (authError) {
+      console.warn("syncToSheets: Invalid or expired token", authError.message);
+      res.status(401).json({error: "Invalid or expired token"});
+      return;
+    }
+
     const contractId = req.query.contractId;
 
     if (!contractId) {

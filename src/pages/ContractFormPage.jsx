@@ -10,6 +10,7 @@ import { loadPromotionsFromFirebase, defaultPromotions, filterPromotionsByDongXe
 import CurrencyInput from '../components/shared/CurrencyInput';
 import { generateVSO } from '../utils/vsoGenerator';
 import { isValidCCCD, isValidPhone, validateRequiredFields } from '../utils/validation';
+import { sanitizeContractData } from '../utils/sanitize';
 
 export default function ContractFormPage() {
   const navigate = useNavigate();
@@ -728,7 +729,9 @@ export default function ContractFormPage() {
         console.log("Update data being sent to Firebase:", updateData);
         console.log("Loan amount in update data:", updateData.soTienVay);
 
-        await update(contractRef, updateData);
+        // Sanitize data before Firebase write
+        const sanitizedUpdateData = sanitizeContractData(updateData);
+        await update(contractRef, sanitizedUpdateData);
 
         // Sync with exportedContracts based on status change
         const exportKey = contractData.firebaseKey;
@@ -788,7 +791,9 @@ export default function ContractFormPage() {
             soTienPhaiThu: safeValue(contract.soTienPhaiThu),
           };
 
-          await set(exportedContractRef, exportedData);
+          // Sanitize data before Firebase write
+          const sanitizedExportedData = sanitizeContractData(exportedData);
+          await set(exportedContractRef, sanitizedExportedData);
         }
         // If changing from "xuất" to non-"xuất": remove from exportedContracts
         else if (oldStatusLower === "xuất" && newStatusLower !== "xuất") {
@@ -841,7 +846,9 @@ export default function ContractFormPage() {
         console.log("New contract data being sent to Firebase:", newContractData);
         console.log("Loan amount in new contract:", newContractData.soTienVay);
 
-        const newRef = await push(contractsRef, newContractData);
+        // Sanitize data before Firebase write
+        const sanitizedNewContractData = sanitizeContractData(newContractData);
+        const newRef = await push(contractsRef, sanitizedNewContractData);
 
         // If new contract status is "xuất", also add to exportedContracts
         const newStatus = safeValue(contract.status) || "mới";
@@ -901,7 +908,9 @@ export default function ContractFormPage() {
             };
 
             const exportedContractRef = ref(database, `exportedContracts/${exportKey}`);
-            await set(exportedContractRef, exportedData);
+            // Sanitize data before Firebase write
+            const sanitizedExportedData = sanitizeContractData(exportedData);
+            await set(exportedContractRef, sanitizedExportedData);
           }
         }
 
