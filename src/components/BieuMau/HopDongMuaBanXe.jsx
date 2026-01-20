@@ -12,6 +12,7 @@ import {
   uniqueNoiThatColors,
 } from "../../data/calculatorData";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency } from "../../utils/formatting";
 import CurrencyInput from "../shared/CurrencyInput";
 
 const HopDongMuaBanXe = () => {
@@ -289,14 +290,6 @@ const HopDongMuaBanXe = () => {
     if (validateBeforePrint()) {
       window.print();
     }
-  };
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
   };
 
   // Helper function to format ưu đãi as bulleted list

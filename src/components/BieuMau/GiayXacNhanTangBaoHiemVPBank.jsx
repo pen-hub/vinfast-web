@@ -6,6 +6,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { formatCurrency } from "../../utils/formatting";
 
 const GiayXacNhanTangBaoHiemVPBank = () => {
   const location = useLocation();
@@ -39,14 +40,6 @@ const GiayXacNhanTangBaoHiemVPBank = () => {
   const [ngayCuoi, setNgayCuoi] = useState("");
   const [thangCuoi, setThangCuoi] = useState("");
   const [namCuoi, setNamCuoi] = useState("");
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
-  };
 
   useEffect(() => {
     const loadData = async () => {

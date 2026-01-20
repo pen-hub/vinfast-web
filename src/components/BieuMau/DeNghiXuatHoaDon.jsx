@@ -4,6 +4,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { formatCurrency } from "../../utils/formatting";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 
@@ -47,13 +48,7 @@ const DeNghiXuatHoaDon = () => {
     return "Trường Chinh";
   };
 
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} vnđ`;
-  };
+  const formatCurrencyWithSuffix = (amount) => formatCurrency(amount, true);
 
   const parseCurrency = (value) => {
     if (!value) return "";

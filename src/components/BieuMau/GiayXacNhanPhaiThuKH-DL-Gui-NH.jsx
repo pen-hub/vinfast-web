@@ -7,6 +7,7 @@ import {
   getDefaultBranch,
 } from "../../data/branchData";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 
 const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
   const location = useLocation();
@@ -51,24 +52,6 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
   const [chuTaiKhoan, setChuTaiKhoan] = useState("");
   const [congTyTaiKhoan, setCongTyTaiKhoan] = useState("");
 
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    const number = value.replace(/[^\d]/g, "");
-    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    try {
-      if (dateStr.includes("/")) {
-        return dateStr;
-      }
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? "" : date.toLocaleDateString("vi-VN");
-    } catch {
-      return "";
-    }
-  };
 
   useEffect(() => {
     const loadData = async () => {

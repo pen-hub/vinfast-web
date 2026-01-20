@@ -6,6 +6,7 @@ import {
 } from "../../data/branchData";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
+import { formatCurrency } from "../../utils/formatting";
 
 const GiayXacNhanTangBaoHiem = () => {
   const location = useLocation();
@@ -200,13 +201,6 @@ const GiayXacNhanTangBaoHiem = () => {
 
     loadData();
   }, [location.state]);
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND`;
-  };
 
   // Helper function to convert dd/mm/yyyy to yyyy-mm-dd (for input date)
   const convertToDateInput = (dateString) => {

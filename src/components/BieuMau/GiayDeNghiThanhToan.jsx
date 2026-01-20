@@ -8,6 +8,7 @@ import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { uniqueNgoaiThatColors } from "../../data/calculatorData";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 
 const GiayDeNghiThanhToan = () => {
   const location = useLocation();
@@ -158,13 +159,6 @@ const GiayDeNghiThanhToan = () => {
     loadData();
   }, [location.state]);
 
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} đồng`;
-  };
 
 
   const handleBack = () => {

@@ -4,6 +4,7 @@ import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import logoImage from "../../assets/images/logo.svg";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import {
   getBranchByShowroomName,
   getDefaultBranch,
@@ -18,19 +19,6 @@ const Thoa_thuan_ho_tro_lai_suat_vay_CĐX_Vinfast_va_LFVN = () => {
   const [branch, setBranch] = useState(null);
 
   // Helper functions
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    // Remove all non-digit characters first
-    const numericAmount =
-      typeof amount === "string"
-        ? amount.replace(/\D/g, "")
-        : String(amount).replace(/\D/g, "");
-    if (!numericAmount) return "";
-    const num = parseFloat(numericAmount);
-    if (isNaN(num)) return "";
-    return num.toLocaleString("vi-VN");
-  };
-
   const pad = (num) => String(num).padStart(2, "0");
 
   // Helper function to format date as dd/mm/yyyy

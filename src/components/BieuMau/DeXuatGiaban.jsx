@@ -6,6 +6,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import {
   uniqueNgoaiThatColors,
   uniqueNoiThatColors,
@@ -76,28 +77,6 @@ const DeXuatGiaban = () => {
   const [lyDo, setLyDo] = useState(
     "(Lưu ý: Mức lương TVBH phụ thuộc vào chính sách của VINFAST, trường hợp tại thời điểm XHĐ chính sách VINFAST thay đổi, Cty sẽ xem xét điều chỉnh phù hợp)"
   );
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
-  };
-
-  const formatDate = (dateValue) => {
-    if (!dateValue) return "";
-    try {
-      const date = new Date(dateValue);
-      if (isNaN(date.getTime())) return dateValue; // Return original if invalid date
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    } catch (error) {
-      return dateValue; // Return original if error
-    }
-  };
 
   // Helper function to get color name from color code
   const getColorName = (colorCode, isExterior = true) => {

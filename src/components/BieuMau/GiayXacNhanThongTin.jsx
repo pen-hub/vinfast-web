@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getBranchByShowroomName } from "../../data/branchData";
+import { formatDate } from "../../utils/formatting";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 
@@ -140,16 +141,16 @@ const GiayXacNhanThongTin = () => {
     loadData();
   }, [location.state]);
 
-  const formatDate = (dateStr) => {
+  const formatDateForDisplay = (dateStr) => {
     if (!dateStr) return { formatted: "08 tháng 10 năm 2024" };
     try {
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) return { formatted: "08 tháng 10 năm 2024" };
-      
+
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
-      
+
       return {
         formatted: `${day} tháng ${month} năm ${year}`
       };

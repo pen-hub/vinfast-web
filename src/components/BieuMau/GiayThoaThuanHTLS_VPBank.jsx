@@ -4,6 +4,7 @@ import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { getBranchByShowroomName, getDefaultBranch } from "../../data/branchData";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import vinfastLogo from "../../assets/vinfast.svg";
 import CurrencyInput from "../shared/CurrencyInput";
 
@@ -78,11 +79,6 @@ const GiayThoaThuanHTLS_VPBank = () => {
   const [ngayKetThucChuongTrinhRaw, setNgayKetThucChuongTrinhRaw] =
     useState("2025-12-31");
 
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    const number = value.replace(/[^\d]/g, "");
-    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
 
   const pad = (num) => String(num).padStart(2, "0");
 
@@ -121,30 +117,6 @@ const GiayThoaThuanHTLS_VPBank = () => {
       // If parsing fails, return empty
     }
     return "";
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    // Nếu đã là định dạng dd/mm/yyyy hoặc dd-mm-yyyy thì giữ nguyên
-    if (
-      dateString.includes("/") ||
-      (dateString.includes("-") && dateString.split("-")[0].length <= 2)
-    ) {
-      return dateString;
-    }
-    // Nếu là ISO date (yyyy-mm-dd)
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      }
-    } catch (e) {
-      // Nếu không parse được, trả về nguyên bản
-    }
-    return dateString;
   };
 
   useEffect(() => {

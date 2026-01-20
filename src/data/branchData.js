@@ -3,6 +3,9 @@
  * Đồng bộ từ Google Sheet - Thông tin chi nhánh
  */
 
+// Branch lookup cache
+const branchCache = new Map();
+
 export const branches = [
   {
     id: 1,
@@ -95,13 +98,18 @@ export const getBranchByName = (name) => {
 };
 
 /**
- * Tìm chi nhánh theo tên showroom (hỗ trợ các tên thường dùng)
+ * Tìm chi nhánh theo tên showroom (hỗ trợ các tên thường dùng) - with caching
  * @param {string} showroomName - Tên showroom (ví dụ: "Chi Nhánh Trường Chinh", "TRƯỜNG CHINH", "Trường Chinh")
  * @returns {Object|null} Thông tin chi nhánh hoặc null nếu không tìm thấy
  */
 export const getBranchByShowroomName = (showroomName) => {
   if (!showroomName) return null;
   const searchName = showroomName.toLowerCase().trim();
+
+  // Check cache first
+  if (branchCache.has(searchName)) {
+    return branchCache.get(searchName);
+  }
   
   // Mapping các tên thường dùng
   const nameMapping = {
@@ -118,7 +126,7 @@ export const getBranchByShowroomName = (showroomName) => {
     "sr thủ đức": 1,
     "võ nguyên giáp": 1,
     "an khánh": 1,
-    
+
     // Trường Chinh (ID 2)
     "trường chinh": 2,
     "truong chinh": 2,
@@ -134,7 +142,7 @@ export const getBranchByShowroomName = (showroomName) => {
     "showroom trường chinh": 2,
     "sr trường chinh": 2,
     "682a trường chinh": 2,
-    
+
     // Âu Cơ (ID 3)
     "âu cơ": 3,
     "au co": 3,
@@ -155,27 +163,36 @@ export const getBranchByShowroomName = (showroomName) => {
   // Kiểm tra mapping trước (exact match)
   const mappedId = nameMapping[searchName];
   if (mappedId) {
-    return getBranchById(mappedId);
+    const branch = getBranchById(mappedId);
+    branchCache.set(searchName, branch);
+    return branch;
   }
 
   // Kiểm tra partial match - ưu tiên theo thứ tự
+  let branch = null;
+
   // Âu Cơ trước (vì "âu cơ" không có trong tên khác)
   if (searchName.includes("âu cơ") || searchName.includes("au co") || searchName.includes("s41501")) {
-    return getBranchById(3);
+    branch = getBranchById(3);
   }
   // Trường Chinh
-  if (searchName.includes("trường chinh") || searchName.includes("truong chinh") || searchName.includes("s00901")) {
-    return getBranchById(2);
+  else if (searchName.includes("trường chinh") || searchName.includes("truong chinh") || searchName.includes("s00901")) {
+    branch = getBranchById(2);
   }
   // Thủ Đức / Đông Sài Gòn chính
-  if (searchName.includes("thủ đức") || searchName.includes("thu duc") || 
+  else if (searchName.includes("thủ đức") || searchName.includes("thu duc") ||
       searchName.includes("s00501") || searchName.includes("võ nguyên giáp") ||
       (searchName.includes("đông sài gòn") && !searchName.includes("chi nhánh"))) {
-    return getBranchById(1);
+    branch = getBranchById(1);
+  }
+  // Tìm theo tên (fallback)
+  else {
+    branch = getBranchByName(showroomName);
   }
 
-  // Tìm theo tên (fallback)
-  return getBranchByName(showroomName);
+  // Cache result
+  branchCache.set(searchName, branch);
+  return branch;
 };
 
 /**
@@ -194,6 +211,11 @@ export const getAllBranches = () => {
   return branches;
 };
 
+/**
+ * Clear branch cache (for testing)
+ */
+export const clearBranchCache = () => branchCache.clear();
+
 export default {
   branches,
   getBranchById,
@@ -202,4 +224,5 @@ export default {
   getBranchByShowroomName,
   getDefaultBranch,
   getAllBranches,
+  clearBranchCache,
 };

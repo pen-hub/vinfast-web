@@ -6,6 +6,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 
 const GiayXacNhanSKSM = () => {
   const location = useLocation();
@@ -27,39 +28,6 @@ const GiayXacNhanSKSM = () => {
   const [customerEmail, setCustomerEmail] = useState("");
   const [taiKhoan, setTaiKhoan] = useState("");
   const [nganHangNhan, setNganHangNhan] = useState("");
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} vnđ`;
-  };
-
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    // Nếu đã là định dạng dd/mm/yyyy hoặc dd-mm-yyyy thì giữ nguyên
-    if (
-      dateString.includes("/") ||
-      (dateString.includes("-") && dateString.split("-")[0].length <= 2)
-    ) {
-      return dateString;
-    }
-    // Nếu là ISO date (yyyy-mm-dd)
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      }
-    } catch (e) {
-      // Nếu không parse được, trả về nguyên bản
-    }
-    return dateString;
-  };
 
   useEffect(() => {
     const loadData = async () => {

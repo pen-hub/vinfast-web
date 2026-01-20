@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getBranchByShowroomName, getDefaultBranch } from "../../data/branchData";
+import { formatCurrency, formatDate } from "../../utils/formatting";
+import { PrintStyles } from "./PrintStyles";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 
@@ -26,13 +28,13 @@ const GiayXacNhan = () => {
           // Thử exportedContracts trước (vì đây là từ trang hợp đồng đã xuất)
           let contractsRef = ref(database, `exportedContracts/${contractId}`);
           let snapshot = await get(contractsRef);
-          
+
           // Nếu không có trong exportedContracts, thử contracts
           if (!snapshot.exists()) {
             contractsRef = ref(database, `contracts/${contractId}`);
             snapshot = await get(contractsRef);
           }
-          
+
           if (snapshot.exists()) {
             const contractData = snapshot.val();
             if (contractData.showroom) {
@@ -96,27 +98,6 @@ const GiayXacNhan = () => {
 
     loadShowroom();
   }, [location.state]);
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    try {
-      if (dateStr.includes("/")) {
-        return dateStr;
-      }
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? "" : date.toLocaleDateString("vi-VN");
-    } catch {
-      return "";
-    }
-  };
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} vnđ`;
-  };
 
   const handleBack = () => {
     navigate(-1);
@@ -191,6 +172,8 @@ const GiayXacNhan = () => {
       className="min-h-screen bg-gray-50 p-8"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
+
       <div className="flex gap-6 max-w-4xl mx-auto print:max-w-4xl print:mx-auto">
         <div className="flex-1 bg-white" id="printable-content">
           {/* Header */}
@@ -375,7 +358,7 @@ const GiayXacNhan = () => {
                   <td className="py-0.5">Giá trị khai báo</td>
                   <td className="py-0.5 text-center">:</td>
                   <td className="py-0.5 font-semibold">
-                    {formatCurrency(data.contractPrice)}
+                    {formatCurrency(data.contractPrice)} vnđ
                   </td>
                 </tr>
               </tbody>
@@ -406,86 +389,6 @@ const GiayXacNhan = () => {
           </button>
         </div>
       </div>
-
-      <style>{`
-        @media print {
-          @page {
-            margin: 0;
-            size: A4 portrait;
-          }
-          
-          body * {
-            visibility: hidden;
-          }
-          
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-          
-          .max-w-7xl.flex {
-            display: block !important;
-          }
-          
-          #printable-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 10mm 15mm 8mm 15mm;
-            box-shadow: none;
-            page-break-after: avoid;
-            page-break-inside: avoid;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-          
-          .print\\:hidden {
-            display: none !important;
-          }
-          
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            overflow: hidden !important;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-          
-          table {
-            page-break-inside: avoid;
-          }
-          
-          h1 {
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 1.25rem;
-          }
-
-          /* Đảm bảo header hiển thị đầy đủ khi in */
-          #printable-content .border-2 {
-            border: 2px solid black !important;
-          }
-          
-          #printable-content .flex > div {
-            min-height: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-          }
-          
-          #printable-content .text-\\[10px\\] {
-            font-size: 10px !important;
-            line-height: 1.2;
-          }
-        }
-
-        /* CSS cho màn hình */
-        .text-\\[10px\\] {
-          font-size: 10px;
-          line-height: 1.2;
-        }
-      `}</style>
     </div>
   );
 };

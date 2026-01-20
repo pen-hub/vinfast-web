@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { getBranchByShowroomName, getDefaultBranch } from "../../data/branchData";
+import { formatDate } from "../../utils/formatting";
 import vinfastLogo from "../../assets/vinfast.svg";
 
 const TTHTLV_CĐX_Shinhan_gui_DL = () => {
@@ -13,23 +14,6 @@ const TTHTLV_CĐX_Shinhan_gui_DL = () => {
 
   // Helper functions
   const pad = (num) => String(num).padStart(2, "0");
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    if (dateString.includes("/") || (dateString.includes("-") && dateString.split("-")[0].length <= 2)) {
-      return dateString;
-    }
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      }
-    } catch (e) {}
-    return dateString;
-  };
 
   // Editable fields
   const [ngayKy, setNgayKy] = useState("");

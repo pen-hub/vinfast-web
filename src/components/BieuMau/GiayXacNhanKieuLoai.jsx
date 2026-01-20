@@ -5,6 +5,7 @@ import { database } from "../../firebase/config";
 import {
   getBranchByShowroomName,
 } from "../../data/branchData";
+import { formatDate } from "../../utils/formatting";
 
 const GiayXacNhanKieuLoai = () => {
   const location = useLocation();
@@ -24,31 +25,6 @@ const GiayXacNhanKieuLoai = () => {
   const [ngayThang, setNgayThang] = useState("18");
   const [thangNam, setThangNam] = useState("11");
   const [nam, setNam] = useState("2025");
-
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    // Nếu đã là định dạng dd/mm/yyyy hoặc dd-mm-yyyy thì giữ nguyên
-    if (
-      dateString.includes("/") ||
-      (dateString.includes("-") && dateString.split("-")[0].length <= 2)
-    ) {
-      return dateString;
-    }
-    // Nếu là ISO date (yyyy-mm-dd)
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      }
-    } catch (e) {
-      // Nếu không parse được, trả về nguyên bản
-    }
-    return dateString;
-  };
 
   useEffect(() => {
     const loadData = async () => {

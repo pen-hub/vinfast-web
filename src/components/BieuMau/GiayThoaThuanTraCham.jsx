@@ -7,6 +7,7 @@ import {
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import CurrencyInput from "../shared/CurrencyInput";
 
 const GiayThoaThuanTraCham = () => {
@@ -287,19 +288,6 @@ const GiayThoaThuanTraCham = () => {
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    try {
-      if (dateStr.includes("/")) {
-        return dateStr;
-      }
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? "" : date.toLocaleDateString("vi-VN");
-    } catch {
-      return "";
-    }
-  };
-
   const formatDateLong = (dateStr) => {
     if (!dateStr) return "";
     try {
@@ -318,13 +306,6 @@ const GiayThoaThuanTraCham = () => {
     } catch {
       return "";
     }
-  };
-
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
   };
 
   const handleBack = () => {

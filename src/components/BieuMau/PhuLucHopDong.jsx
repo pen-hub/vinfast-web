@@ -7,6 +7,7 @@ import {
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import logoImage from "../../assets/images/logo.svg";
 
 const PhuLucHopDong = () => {
@@ -161,13 +162,6 @@ const PhuLucHopDong = () => {
     });
   }, [location.state]);
 
-  const formatCurrency = (amount) => {
-    if (!amount) return "";
-    const numericAmount =
-      typeof amount === "string" ? amount.replace(/\D/g, "") : String(amount);
-    if (!numericAmount) return "";
-    return `${numericAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")} đồng`;
-  };
 
   const handleBack = () => {
     navigate(-1);

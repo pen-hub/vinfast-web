@@ -6,6 +6,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { formatCurrency } from "../../utils/formatting";
 
 const GiayThoaThuanHTVLCT90_nien_kim_60_thang = () => {
   const location = useLocation();
@@ -65,12 +66,6 @@ const GiayThoaThuanHTVLCT90_nien_kim_60_thang = () => {
   const [tyLeVay, setTyLeVay] = useState("");
   const [laiSuatNH, setLaiSuatNH] = useState("");
   const [laiSuatSauCoDinh, setLaiSuatSauCoDinh] = useState("");
-
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    const number = value.replace(/[^\d]/g, "");
-    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
 
   useEffect(() => {
     const loadData = async () => {

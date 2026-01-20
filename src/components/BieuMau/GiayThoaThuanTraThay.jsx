@@ -7,6 +7,7 @@ import {
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { vndToWords } from "../../utils/vndToWords";
+import { formatCurrency, formatDate } from "../../utils/formatting";
 import CurrencyInput from "../shared/CurrencyInput";
 
 const GiayThoaThuanTraThay = () => {
@@ -68,15 +69,6 @@ const GiayThoaThuanTraThay = () => {
 
   // Date fields for policy
   const [ngayBatDauChinhSach, setNgayBatDauChinhSach] = useState("13/09/2025");
-
-  // Helper function to format currency
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    const numericValue =
-      typeof value === "string" ? value.replace(/\D/g, "") : String(value);
-    if (!numericValue) return "";
-    return parseInt(numericValue, 10).toLocaleString("vi-VN");
-  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -301,19 +293,6 @@ const GiayThoaThuanTraThay = () => {
 
     loadData();
   }, [location.state]);
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    try {
-      if (dateStr.includes("/")) {
-        return dateStr;
-      }
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? "" : date.toLocaleDateString("vi-VN");
-    } catch {
-      return "";
-    }
-  };
 
   const handleBack = () => {
     navigate(-1);
