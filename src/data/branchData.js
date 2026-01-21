@@ -23,6 +23,7 @@ export const branches = [
     accountHolder: "CT CP DT TM DV OTO DONG SAI GON",
     representativeName: "Nguyễn Thành Trai",
     position: "Tổng Giám Đốc",
+    zaloPhone: "0901234567",
   },
   {
     id: 2,
@@ -40,6 +41,7 @@ export const branches = [
     accountHolder: "CN TRUONG CHINH CTCP DONG SAI GON",
     representativeName: "Nguyễn Thành Trai",
     position: "Tổng Giám Đốc",
+    zaloPhone: "0907654321",
   },
   {
     id: 3,
@@ -57,6 +59,7 @@ export const branches = [
     accountHolder: "CN AU CO CTCP DONG SAI GON",
     representativeName: "Nguyễn Thành Trai",
     position: "Tổng Giám Đốc",
+    zaloPhone: "0909876543",
   },
 ];
 

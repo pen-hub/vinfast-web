@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import ZaloFloatingButton from './components/ZaloFloatingButton'
 
 // Import critical pages directly, lazy pages from LazyPages
 import {
@@ -295,6 +296,9 @@ function App() {
 
         {/* Footer */}
         <Footer />
+
+        {/* Zalo floating button */}
+        <ZaloFloatingButton />
 
         {/* Toast notifications */}
         <ToastContainer
