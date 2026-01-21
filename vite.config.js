@@ -14,7 +14,8 @@ export default defineConfig({
         manualChunks: (id) => {
           // Vendor chunks - split large dependencies
           if (id.includes('node_modules')) {
-            if (id.includes('react-dom') || id.includes('react-router')) {
+            // React core must be in the same chunk to avoid duplicate instances
+            if (id.includes('react-dom') || id.includes('react-router') || id.includes('/react/')) {
               return 'vendor-react'
             }
             if (id.includes('firebase')) {
@@ -23,9 +24,8 @@ export default defineConfig({
             if (id.includes('chart.js') || id.includes('react-chartjs')) {
               return 'vendor-charts'
             }
-            if (id.includes('react-toastify')) {
-              return 'vendor-ui'
-            }
+            // react-toastify needs React, so it should be in vendor-react or default chunk
+            // Don't separate it into vendor-ui as it causes useLayoutEffect issues
           }
 
           // Feature chunks - group related components
