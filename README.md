@@ -46,27 +46,32 @@ npm run preview
 
 ### Contract Management
 - Create, edit, export contracts
-- Auto-generate VSO codes: `{maDms}-VSO-{YY}-{MM}-{sequence}`
-- Filter by showroom, status, date
+- Auto-generate VSO codes: `{maDms}-VSO-{YY}-{MM}-{sequence}` (atomic transactions)
+- Filter by showroom, status, date, TVBH
+- RBAC access control (admin/leader/user)
 
 ### Price Calculator (Báo Giá)
-- 12 vehicle models (VF 3-9, Minio, Herio, Nerio, Limo, EC)
-- Apply discounts and promotions
-- Calculate loan payments
+- 12 vehicle models (VF 3, 5, 6, 7, 8, 9, Nimo, Herio, Nerio, Limo, ECVan)
+- Apply discounts and promotions filtered by dongXe
+- Calculate loan payments with Annuity formula
+- On-road costs breakdown (BHVC, plate, inspection, road fees)
 
 ### Print Forms (Biểu Mẫu)
-- 27 legal document templates
+- 27 legal document templates (~22K LOC)
 - Contracts, agreements, confirmations
 - Bank-specific forms (BIDV, Shinhan, TPBank, VPBank, LFVN)
+- A4 print validation with required fields check
 
 ### Dashboard
-- Sales analytics with charts
-- Top performers
-- Contract status overview
+- Sales analytics with Chart.js
+- Time filters (day/week/month/quarter/year/range)
+- Employee performance charts
+- Pending contracts table
 
 ### HR & Customer Management
 - Employee directory by showroom
-- Customer database with history
+- Customer database with CRUD and history
+- Lead scoring and work history tracking
 
 ---
 
@@ -90,17 +95,26 @@ npm run preview
 ```
 src/
 ├── components/
-│   ├── BieuMau/          # 27 printable forms
-│   ├── FilterPanel/      # Filter UI
+│   ├── BieuMau/          # 27 printable forms (~22K LOC)
+│   ├── Calculator/       # Price calculator components (7 files)
+│   ├── FilterPanel/      # Unified filter panel
 │   ├── shared/           # CurrencyInput, Pagination
-│   └── Header, Footer    # Layout
-├── pages/                # 16 page components
-├── data/                 # Branch, vehicle, promotion data
+│   └── Header, Footer, EmployeeBarChart, PendingContractsTable
+├── pages/                # 16 page components (~21K LOC)
+├── hooks/                # 12 custom hooks (~2.3K LOC)
+│   ├── useCarSelection, usePromotions, usePriceCalculations
+│   ├── useCustomerData, useCustomerForm, useContractForm
+│   └── usePaginatedFirebase
+├── data/                 # Branch, vehicle, promotion data (~500 LOC)
+├── utils/                # 10 utility files (~950 LOC)
+│   ├── vsoGenerator (atomic), vndToWords, validation
+│   ├── sanitize, formatting
+│   └── calculator/       # Price/promotion/loan utils
 ├── firebase/             # Firebase config
-└── utils/                # VSO generator, VND to words
+└── config/               # Cloudinary config
 
-functions/                # Cloud Functions
-├── index.js              # 4 functions (Sheets sync, daily summary)
+functions/                # Cloud Functions (319 LOC)
+├── index.js              # 4 functions (Sheets sync, daily summary, HTTP endpoint)
 └── package.json
 ```
 
