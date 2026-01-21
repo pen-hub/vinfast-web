@@ -567,9 +567,9 @@ const GiayXacNhanSKSM = () => {
             </div>
 
             {/* Thông tin xe */}
-            <div className="space-y-1 mt-2 print:mt-1 ml-24">
+            <div className="space-y-1 mt-2 print:mt-1">
               <div className="flex items-start">
-                <span className="inline-block w-20">Hiệu xe</span>
+                <span className="inline-block w-32">Hiệu xe</span>
                 <span className="inline-block w-4 text-center">:</span>
                 <span className="font-bold flex-1">
                   <span className="print:hidden">
@@ -584,7 +584,7 @@ const GiayXacNhanSKSM = () => {
                 </span>
               </div>
               <div className="flex items-start">
-                <span className="inline-block w-20">Số khung</span>
+                <span className="inline-block w-32">Số khung</span>
                 <span className="inline-block w-4 text-center">:</span>
                 <span className="font-bold text-red-600 flex-1">
                   <span className="print:hidden">
@@ -599,7 +599,7 @@ const GiayXacNhanSKSM = () => {
                 </span>
               </div>
               <div className="flex items-start">
-                <span className="inline-block w-20">Số máy</span>
+                <span className="inline-block w-32">Số máy</span>
                 <span className="inline-block w-4 text-center">:</span>
                 <span className="flex-1">
                   <span className="print:hidden">

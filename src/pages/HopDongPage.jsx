@@ -2057,32 +2057,6 @@ export default function HopDongPage() {
                         />
                       )}
                     </div>
-
-                    <div>
-                      <label htmlFor="minPurchase" className="block text-sm font-medium text-gray-700 mb-2">
-                        Đơn hàng tối thiểu (VNĐ)
-                      </label>
-                      <CurrencyInput
-                        value={editingPromotion.minPurchase}
-                        onChange={(val) => setEditingPromotion({...editingPromotion, minPurchase: val})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm sm:text-base"
-                        placeholder="0"
-                      />
-                    </div>
-
-                    {promotionType === 'percentage' && (
-                      <div>
-                        <label htmlFor="maxDiscount" className="block text-sm font-medium text-gray-700 mb-2">
-                          Giảm tối đa (VNĐ)
-                        </label>
-                        <CurrencyInput
-                          value={editingPromotion.maxDiscount}
-                          onChange={(val) => setEditingPromotion({...editingPromotion, maxDiscount: val})}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm sm:text-base"
-                          placeholder="0 (không giới hạn)"
-                        />
-                      </div>
-                    )}
                   </div>
                 )}
 

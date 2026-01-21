@@ -163,7 +163,7 @@ const HopDongMuaBanXe = () => {
         setGiayUyQuyen2(processedData.giayUyQuyen || "");
         setGiayUyQuyen2Ngay(processedData.giayUyQuyenNgay || "");
         if (processedData.giayUyQuyenNgay) {
-          setGiayUyQuyen2NgayRaw(processedData.giayUyQuyenNgay.includes('/') ? 
+          setGiayUyQuyen2NgayRaw(processedData.giayUyQuyenNgay.includes('/') ?
             (() => {
               const [day, month, year] = processedData.giayUyQuyenNgay.split('/');
               return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -954,7 +954,7 @@ const HopDongMuaBanXe = () => {
                 )}
               </div>
               <div className="hidden print:block">{formatUuDaiList(uuDai)}</div>
-              <p className="mb-2 text-left leading-relaxed">
+              <p className="text-left leading-relaxed">
                 Thông tin chi tiết được công bố tại website:{" "}
                 <a
                   href="https://vinfastauto.com"

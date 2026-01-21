@@ -31,6 +31,12 @@ const GiayDeNghiThanhToan = () => {
   );
   const [accountHolder, setAccountHolder] = useState("");
 
+  // Editable date field - default to current date
+  const today = new Date();
+  const [headerDate, setHeaderDate] = useState(
+    `TP.HCM, Ngày ${today.getDate()} Tháng ${today.getMonth() + 1} năm ${today.getFullYear()}`
+  );
+
   // Helper function to get shortName from showroom (similar to GiayXacNhanThongTin.jsx)
   const getShowroomShortName = (showroomValue) => {
     if (!showroomValue) return "Trường Chinh";
@@ -165,11 +171,6 @@ const GiayDeNghiThanhToan = () => {
     navigate(-1);
   };
 
-  // Current date formatted for header: "TP.HCM, Ngày D Tháng M năm YYYY"
-  const today = new Date();
-  const headerDate = `TP.HCM, Ngày ${today.getDate()} Tháng ${today.getMonth() + 1
-    } năm ${today.getFullYear()}`;
-
   if (loading) {
     return (
       <div
@@ -245,7 +246,18 @@ const GiayDeNghiThanhToan = () => {
                 <p className="font-bold text-sm mb-1">
                   Độc lập - Tự do - Hạnh phúc
                 </p>
-                <p className="italic text-sm mt-4">{headerDate}</p>
+                <p className="italic text-sm mt-4">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={headerDate}
+                      onChange={(e) => setHeaderDate(e.target.value)}
+                      className="border-b border-gray-400 px-1 text-center focus:outline-none focus:border-blue-500 italic text-sm bg-transparent"
+                      style={{ minWidth: '200px' }}
+                    />
+                  </span>
+                  <span className="hidden print:inline">{headerDate}</span>
+                </p>
               </div>
             </div>
           </div>

@@ -245,13 +245,18 @@ const GiayXacNhan = () => {
 
           {/* Company Information - Bên Bán */}
           <div className="mb-3 text-sm text-red-600">
-            <table className="w-full">
+            <table className="w-full" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '100px' }} />
+                <col style={{ width: '16px' }} />
+                <col />
+              </colgroup>
               <tbody>
                 <tr>
-                  <td className="py-0.5 font-bold w-32 align-top">
+                  <td className="py-0.5 font-bold align-top">
                     BÊN BÁN
                   </td>
-                  <td className="py-0.5 w-4 text-center align-top">:</td>
+                  <td className="py-0.5 text-center align-top">:</td>
                   <td className="py-0.5 font-bold">
                     {branch ? branch.name : "[Chưa chọn showroom]"}
                   </td>
@@ -295,11 +300,16 @@ const GiayXacNhan = () => {
 
           {/* Customer Information */}
           <div className="mb-3">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '100px' }} />
+                <col style={{ width: '16px' }} />
+                <col />
+              </colgroup>
               <tbody>
                 <tr>
-                  <td className="py-0.5 font-semibold w-32">BÊN MUA</td>
-                  <td className="py-0.5 w-4 text-center">:</td>
+                  <td className="py-0.5 font-semibold">BÊN MUA</td>
+                  <td className="py-0.5 text-center">:</td>
                   <td className="py-0.5 font-bold">{data.customerName}</td>
                 </tr>
                 <tr>
@@ -325,21 +335,21 @@ const GiayXacNhan = () => {
                   <td className="py-0.5 text-center">:</td>
                   <td className="py-0.5">{data.Email}</td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Purchase Information */}
-          <p className="text-sm mb-2">
-            Bên Bán xác nhận Bên Mua có mua 1 chiếc ô tô của Bên Bán :
-          </p>
-
-          <div className="mb-4">
-            <table className="w-full text-sm">
-              <tbody>
                 <tr>
-                  <td className="py-0.5 w-32">Hiệu xe</td>
-                  <td className="py-0.5 w-8 text-center">:</td>
+                  <td className="py-0.5">Mã số thuế</td>
+                  <td className="py-0.5 text-center">:</td>
+                  <td className="py-0.5"></td>
+                </tr>
+                {/* Dòng text "Bên Bán xác nhận..." */}
+                <tr>
+                  <td colSpan="3" className="py-2">
+                    Bên Bán xác nhận Bên Mua có mua 1 chiếc ô tô của Bên Bán :
+                  </td>
+                </tr>
+                {/* Thông tin xe - cùng bảng để căn thẳng hàng */}
+                <tr>
+                  <td className="py-0.5">Hiệu xe</td>
+                  <td className="py-0.5 text-center">:</td>
                   <td className="py-0.5 uppercase">{data.model || ""}</td>
                 </tr>
                 <tr>
