@@ -6,6 +6,25 @@
 // Branch lookup cache
 const branchCache = new Map();
 
+// Fallback branch when no match found
+const FALLBACK_BRANCH = {
+  id: 0,
+  maDms: '',
+  displayName: '[Chưa xác định]',
+  shortName: '[Chưa xác định]',
+  name: '[Chưa xác định]',
+  headerName: '[Chưa xác định]',
+  address: '',
+  taxCode: '',
+  bankName: '',
+  bankAccount: '',
+  bankBranch: '',
+  accountHolder: '',
+  representativeName: '[Chưa xác định]',
+  position: '',
+  zaloPhone: '',
+};
+
 export const branches = [
   {
     id: 1,
@@ -103,17 +122,17 @@ export const getBranchByName = (name) => {
 /**
  * Tìm chi nhánh theo tên showroom (hỗ trợ các tên thường dùng) - with caching
  * @param {string} showroomName - Tên showroom (ví dụ: "Chi Nhánh Trường Chinh", "TRƯỜNG CHINH", "Trường Chinh")
- * @returns {Object|null} Thông tin chi nhánh hoặc null nếu không tìm thấy
+ * @returns {Object} Thông tin chi nhánh hoặc FALLBACK_BRANCH nếu không tìm thấy
  */
 export const getBranchByShowroomName = (showroomName) => {
-  if (!showroomName) return null;
+  if (!showroomName) return FALLBACK_BRANCH;
   const searchName = showroomName.toLowerCase().trim();
 
   // Check cache first
   if (branchCache.has(searchName)) {
     return branchCache.get(searchName);
   }
-  
+
   // Mapping các tên thường dùng
   const nameMapping = {
     // Thủ Đức (ID 1) - Showroom chính
@@ -193,9 +212,12 @@ export const getBranchByShowroomName = (showroomName) => {
     branch = getBranchByName(showroomName);
   }
 
+  // If still null, use FALLBACK_BRANCH
+  const result = branch || FALLBACK_BRANCH;
+
   // Cache result
-  branchCache.set(searchName, branch);
-  return branch;
+  branchCache.set(searchName, result);
+  return result;
 };
 
 /**
@@ -228,4 +250,5 @@ export default {
   getDefaultBranch,
   getAllBranches,
   clearBranchCache,
+  FALLBACK_BRANCH,
 };

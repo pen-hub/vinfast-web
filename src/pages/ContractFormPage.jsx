@@ -460,15 +460,18 @@ export default function ContractFormPage() {
   };
 
   const handleInputChange = async (field, value) => {
+    // Normalize null/undefined to empty string
+    const normalized = value === null || value === undefined ? '' : value;
+
     // Auto-generate VSO when showroom changes
-    if (field === 'showroom' && value) {
-      const selectedBranch = branches.find(b => b.name === value);
+    if (field === 'showroom' && normalized) {
+      const selectedBranch = branches.find(b => b.name === normalized);
       if (selectedBranch) {
         try {
           const newVSO = await generateVSO(selectedBranch.maDms);
           setContract((prev) => ({
             ...prev,
-            showroom: value,
+            showroom: normalized,
             vso: newVSO,
           }));
           return;
@@ -477,7 +480,7 @@ export default function ContractFormPage() {
           // Fallback to maDms if generation fails
           setContract((prev) => ({
             ...prev,
-            showroom: value,
+            showroom: normalized,
             vso: selectedBranch.maDms,
           }));
           return;
@@ -488,7 +491,7 @@ export default function ContractFormPage() {
     setContract((prev) => {
       const updated = {
         ...prev,
-        [field]: value,
+        [field]: normalized,
       };
 
       // Reset dependent fields when model changes (but keep contractPrice)

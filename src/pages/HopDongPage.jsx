@@ -1049,13 +1049,26 @@ export default function HopDongPage() {
     if (selectedContracts.size === 0) return;
 
     try {
-      const exportedContractsRef = ref(database, "exportedContracts");
-      
       // Get all contracts to export
       const contractsToExport = contracts.filter((contract) => {
         const key = contract.firebaseKey || contract.id;
         return key && selectedContracts.has(key);
       });
+
+      // Validate required fields before export
+      const requiredFields = ['customerName', 'phone', 'model', 'cccd'];
+      const invalidContracts = contractsToExport.filter((c) =>
+        requiredFields.some((f) => !c[f] || !String(c[f]).trim())
+      );
+
+      if (invalidContracts.length > 0) {
+        toast.error(
+          `${invalidContracts.length} hợp đồng thiếu thông tin bắt buộc (Tên KH, SĐT, Dòng xe, CCCD)`
+        );
+        return;
+      }
+
+      const exportedContractsRef = ref(database, "exportedContracts");
 
       // Prepare data for export with all required fields
       const exportedKeys = []; // Store exported keys to pass to next page
