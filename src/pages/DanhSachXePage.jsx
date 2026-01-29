@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Edit2, Trash2, Car, BarChart3, Package, TrendingUp, Search, Filter, X, ChevronDown, ChevronUp, Upload, Download, Trash } from 'lucide-react';
+import { Plus, Edit2, Trash2, Car, BarChart3, Package, TrendingUp, Search, Filter, X, ChevronDown, ChevronUp, Upload, Download, Trash, ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { ref, onValue, set, push, update, remove } from 'firebase/database';
 import { database } from '../firebase/config';
@@ -21,7 +21,8 @@ export default function DanhSachXePage() {
         exterior_color: '',
         interior_color: '',
         quantity: 1,
-        status: VEHICLE_STATUSES.READY
+        status: VEHICLE_STATUSES.READY,
+        custom_image_url: ''
     });
     const fileInputRef = useRef(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -479,7 +480,7 @@ export default function DanhSachXePage() {
                 const newVehicle = {
                     ...formData,
                     price: getCarPrice(),
-                    image_url: getCarImage(),
+                    image_url: formData.custom_image_url || getCarImage(),
                     exterior_color_name: getColorName(formData.exterior_color, true),
                     interior_color_name: getColorName(formData.interior_color, false)
                 };
@@ -504,7 +505,7 @@ export default function DanhSachXePage() {
             await updateVehicle(editingVehicle.id, {
                 ...formData,
                 price: getCarPrice(),
-                image_url: getCarImage(),
+                image_url: formData.custom_image_url || getCarImage(),
                 exterior_color_name: getColorName(formData.exterior_color, true),
                 interior_color_name: getColorName(formData.interior_color, false)
             });
@@ -536,7 +537,8 @@ export default function DanhSachXePage() {
             exterior_color: vehicle.exterior_color,
             interior_color: vehicle.interior_color,
             quantity: vehicle.quantity,
-            status: vehicle.status
+            status: vehicle.status,
+            custom_image_url: vehicle.custom_image_url || ''
         });
         setShowEditModal(true);
     };
@@ -548,7 +550,8 @@ export default function DanhSachXePage() {
             exterior_color: '',
             interior_color: '',
             quantity: 1,
-            status: VEHICLE_STATUSES.READY
+            status: VEHICLE_STATUSES.READY,
+            custom_image_url: ''
         });
     };
 
@@ -1077,16 +1080,24 @@ export default function DanhSachXePage() {
                                                                                                                                     {variantIndex + 1}
                                                                                                                                 </td>
                                                                                                                                 <td className="px-4 py-3">
-                                                                                                                                    {variant.image_url && (
+                                                                                                                                    {(variant.custom_image_url || variant.image_url) ? (
                                                                                                                                         <img
-                                                                                                                                            src={variant.image_url}
+                                                                                                                                            src={variant.custom_image_url || variant.image_url}
                                                                                                                                             alt={`${variant.model} ${variant.trim}`}
                                                                                                                                             className="h-12 w-20 object-contain rounded"
                                                                                                                                             onError={(e) => {
                                                                                                                                                 e.target.style.display = 'none';
+                                                                                                                                                e.target.nextElementSibling.style.display = 'flex';
                                                                                                                                             }}
+                                                                                                                                            loading="lazy"
                                                                                                                                         />
-                                                                                                                                    )}
+                                                                                                                                    ) : null}
+                                                                                                                                    <div
+                                                                                                                                        className="h-12 w-20 bg-gray-100 rounded flex items-center justify-center"
+                                                                                                                                        style={{ display: (variant.custom_image_url || variant.image_url) ? 'none' : 'flex' }}
+                                                                                                                                    >
+                                                                                                                                        <Car className="w-6 h-6 text-gray-400" />
+                                                                                                                                    </div>
                                                                                                                                 </td>
                                                                                                                                 <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                                                                                                                                     {variant.model}
@@ -1289,6 +1300,33 @@ export default function DanhSachXePage() {
                                     </select>
                                 </div>
 
+                                {/* Custom Image URL */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Link ảnh xe
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.custom_image_url}
+                                        onChange={(e) => setFormData({ ...formData, custom_image_url: e.target.value })}
+                                        placeholder="Dán link ảnh xe (https://...)"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    {formData.custom_image_url && !formData.custom_image_url.startsWith('https://') && (
+                                        <p className="text-xs text-amber-600 mt-1">Link ảnh nên bắt đầu bằng https://</p>
+                                    )}
+                                    {formData.custom_image_url && formData.custom_image_url.startsWith('https://') && (
+                                        <img
+                                            src={formData.custom_image_url}
+                                            alt="Preview"
+                                            className="mt-2 h-32 w-auto object-contain rounded border border-gray-200"
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                            onLoad={(e) => { e.target.style.display = 'block'; }}
+                                            loading="lazy"
+                                        />
+                                    )}
+                                </div>
+
                                 {/* Price Display */}
                                 {formData.interior_color && (
                                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -1435,6 +1473,33 @@ export default function DanhSachXePage() {
                                             <option key={value} value={value}>{label}</option>
                                         ))}
                                     </select>
+                                </div>
+
+                                {/* Custom Image URL */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Link ảnh xe
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.custom_image_url}
+                                        onChange={(e) => setFormData({ ...formData, custom_image_url: e.target.value })}
+                                        placeholder="Dán link ảnh xe (https://...)"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    {formData.custom_image_url && !formData.custom_image_url.startsWith('https://') && (
+                                        <p className="text-xs text-amber-600 mt-1">Link ảnh nên bắt đầu bằng https://</p>
+                                    )}
+                                    {formData.custom_image_url && formData.custom_image_url.startsWith('https://') && (
+                                        <img
+                                            src={formData.custom_image_url}
+                                            alt="Preview"
+                                            className="mt-2 h-32 w-auto object-contain rounded border border-gray-200"
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                            onLoad={(e) => { e.target.style.display = 'block'; }}
+                                            loading="lazy"
+                                        />
+                                    )}
                                 </div>
 
                                 {/* Price Display */}
