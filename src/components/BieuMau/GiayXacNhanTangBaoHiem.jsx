@@ -7,6 +7,7 @@ import {
 import { ref, get } from "firebase/database";
 import { database } from "../../firebase/config";
 import { formatCurrency } from "../../utils/formatting";
+import { PrintStyles } from "./PrintStyles";
 
 const GiayXacNhanTangBaoHiem = () => {
   const location = useLocation();
@@ -78,13 +79,13 @@ const GiayXacNhanTangBaoHiem = () => {
             // Thử exportedContracts trước (vì đây là từ trang hợp đồng đã xuất)
             let contractsRef = ref(database, `exportedContracts/${contractId}`);
             let snapshot = await get(contractsRef);
-            
+
             // Nếu không có trong exportedContracts, thử contracts
             if (!snapshot.exists()) {
               contractsRef = ref(database, `contracts/${contractId}`);
               snapshot = await get(contractsRef);
             }
-            
+
             if (snapshot.exists()) {
               contractDataFromDB = snapshot.val();
               if (contractDataFromDB.showroom) {
@@ -92,7 +93,7 @@ const GiayXacNhanTangBaoHiem = () => {
               }
             }
           } catch (err) {
-            console.error("Error loading contract from database:", err);
+            console.error("Error loading contract from database:", err);        
           }
         }
 
@@ -105,8 +106,8 @@ const GiayXacNhanTangBaoHiem = () => {
         const getValue = (field, dbField = null) => {
           if (contractDataFromDB) {
             // Thử các tên field khác nhau từ database
-            const dbValue = dbField 
-              ? contractDataFromDB[dbField] || contractDataFromDB[field]
+            const dbValue = dbField
+              ? contractDataFromDB[dbField] || contractDataFromDB[field]        
               : contractDataFromDB[field];
             if (dbValue) return dbValue;
           }
@@ -118,39 +119,39 @@ const GiayXacNhanTangBaoHiem = () => {
             getValue("customerName", "Tên KH") ||
             getValue("tenKh", "Tên Kh") ||
             "",
-          contractNumber: 
-            getValue("vso", "VSO") || 
+          contractNumber:
+            getValue("vso", "VSO") ||
             getValue("contractNumber", "") || "",
           createdAt:
             formatDateToVNPartial(
               getValue("createdAt", "ngày xhd") ||
               getValue("ngayXhd", "ngày XHD")
             ) || "",
-          model: 
+          model:
             getValue("model", "Dòng xe") ||
             getValue("dongXe", "Dòng Xe") ||
             "",
-          vin: 
+          vin:
             getValue("vin", "Số Khung") ||
             getValue("soKhung", "soKhung") ||
             getValue("chassisNumber", "") ||
             "",
-          engineNumber: 
+          engineNumber:
             getValue("engineNumber", "Số Máy") ||
             getValue("soMay", "soMay") ||
             "",
-          vehicleValue: 
+          vehicleValue:
             getValue("vehicleValue", "Giá Hợp Đồng") ||
             getValue("contractPrice", "giaHopDong") ||
             getValue("giaHopDong", "") ||
             "",
-          insuranceValue: 
+          insuranceValue:
             getValue("insuranceValue", "") || "",
-          insuranceContract: 
+          insuranceContract:
             getValue("insuranceContract", "") || "",
-          insuranceStart: 
+          insuranceStart:
             getValue("insuranceStart", "") || "",
-          insuranceEnd: 
+          insuranceEnd:
             getValue("insuranceEnd", "") || "",
           customerAddress:
             getValue("customerAddress", "Địa Chỉ") ||
@@ -163,8 +164,8 @@ const GiayXacNhanTangBaoHiem = () => {
         // Initialize editable fields from data
         setInsuranceContract(processedData.insuranceContract);
         setInsuranceValue(processedData.insuranceValue);
-        setInsuranceStart(convertToDateInput(processedData.insuranceStart));
-        setInsuranceEnd(convertToDateInput(processedData.insuranceEnd));
+        setInsuranceStart(convertToDateInput(processedData.insuranceStart));    
+        setInsuranceEnd(convertToDateInput(processedData.insuranceEnd));        
         if (incoming.recipientInfo) {
           setRecipientInfo(incoming.recipientInfo);
         }
@@ -202,7 +203,7 @@ const GiayXacNhanTangBaoHiem = () => {
     loadData();
   }, [location.state]);
 
-  // Helper function to convert dd/mm/yyyy to yyyy-mm-dd (for input date)
+  // Helper function to convert dd/mm/yyyy to yyyy-mm-dd (for input date)       
   const convertToDateInput = (dateString) => {
     if (!dateString) return "";
     // If already in yyyy-mm-dd format, return as is
@@ -231,7 +232,7 @@ const GiayXacNhanTangBaoHiem = () => {
   const formatDateDisplay = (dateString) => {
     if (!dateString) return "";
     // If already in dd/mm/yyyy format, return as is
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) return dateString;
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) return dateString;        
     // If in yyyy-mm-dd format, convert to dd/mm/yyyy
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       const [yyyy, mm, dd] = dateString.split("-");
@@ -265,7 +266,7 @@ const GiayXacNhanTangBaoHiem = () => {
   if (loading) {
     return (
       <div
-        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        className="min-h-screen bg-gray-50 flex items-center justify-center"    
         style={{ fontFamily: "Times New Roman" }}
       >
         <div className="text-center">
@@ -279,7 +280,7 @@ const GiayXacNhanTangBaoHiem = () => {
   if (!data) {
     return (
       <div
-        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        className="min-h-screen bg-gray-50 flex items-center justify-center"    
         style={{ fontFamily: "Times New Roman" }}
       >
         <div className="text-center">
@@ -300,6 +301,7 @@ const GiayXacNhanTangBaoHiem = () => {
       className="min-h-screen bg-gray-50 p-8"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
       <div className="flex gap-6 max-w-4xl mx-auto print:max-w-4xl print:mx-auto">
         <div className="flex-1 bg-white p-8" id="printable-content">
           {/* Header */}
@@ -308,13 +310,13 @@ const GiayXacNhanTangBaoHiem = () => {
               <div className="flex-1">
                 {branch ? (
                   <>
-                    <p className="font-bold text-sm mb-1">
+                    <p className="font-bold text-sm mb-1 uppercase">
                       CN {branch.shortName?.toUpperCase()} - CÔNG TY
                     </p>
-                    <p className="font-bold text-sm mb-1">
+                    <p className="font-bold text-sm mb-1 uppercase">
                       CP ĐẦU TƯ TM VÀ DV Ô TÔ
                     </p>
-                    <p className="font-bold text-sm">ĐÔNG SÀI GÒN</p>
+                    <p className="font-bold text-sm uppercase">ĐÔNG SÀI GÒN</p>
                   </>
                 ) : (
                   <p className="font-bold text-sm text-gray-400">
@@ -324,10 +326,10 @@ const GiayXacNhanTangBaoHiem = () => {
               </div>
 
               <div className="flex-1 text-center">
-                <p className="font-bold text-sm mb-1">
+                <p className="font-bold text-sm mb-1 uppercase">
                   CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
                 </p>
-                <p className="font-bold text-sm mb-1">
+                <p className="font-bold text-sm mb-1 uppercase">
                   Độc lập – Tự do – Hạnh phúc
                 </p>
                 <p className="italic text-sm mt-4">{headerDate}</p>
@@ -342,122 +344,139 @@ const GiayXacNhanTangBaoHiem = () => {
 
           {/* Recipient */}
           <div className="mb-6">
-            <p className="font-bold mb-1 text-center">
-              <strong>Kính gởi:</strong>{" "}
-              <strong>
+            <div className="font-bold mb-1 text-center flex flex-col items-center">
+              <p><strong>Kính gởi:</strong></p>
+              <div className="max-w-lg">
                 <span className="print:hidden">
                   <input
                     type="text"
                     value={nganHangName}
                     onChange={(e) => setNganHangName(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-full max-w-lg focus:outline-none focus:border-blue-500"
+                    className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-full focus:outline-none focus:border-blue-500 text-center"
                     placeholder="NGÂN HÀNG TMCP VIỆT NAM THỊNH VƯỢNG"
                   />
                 </span>
-                <span className="hidden print:inline">{nganHangName}</span>
-                <br /> –{" "}
+                <span className="hidden print:inline uppercase">{nganHangName}</span>     
+              </div>
+              <div className="max-w-md">
+                –{" "}
                 <span className="print:hidden">
                   <input
                     type="text"
                     value={recipientInfo}
                     onChange={(e) => setRecipientInfo(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm font-normal w-full max-w-md focus:outline-none focus:border-blue-500"
+                    className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-full focus:outline-none focus:border-blue-500 text-center"
                     placeholder="TRUNG TÂM THẾ CHẤP VÙNG 9"
                   />
                 </span>
-                <span className="hidden print:inline">{recipientInfo}</span>
-              </strong>
-            </p>
+                <span className="hidden print:inline uppercase">{recipientInfo}</span>    
+              </div>
+            </div>
           </div>
 
           {/* Content */}
-          <div className="mb-6 text-sm space-y-4">
+          <div className="mb-6 text-sm space-y-1">
             {branch ? (
               <>
-                <p>
-                  Bằng bản này :{" "}
-                  <strong className="uppercase">
+                <div className="info-row grid-cols-[120px_1fr]">
+                  <span className="info-label w-[120px]">Bằng bản này:</span>
+                  <div className="info-value uppercase font-bold">
                     {branch.name}
-                  </strong>
-                </p>
+                  </div>
+                </div>
 
-                <p>
-                  Địa chỉ: {branch.address}
-                </p>
+                <div className="info-row grid-cols-[120px_1fr]">
+                  <span className="info-label w-[120px]">Địa chỉ:</span>
+                  <div className="info-value">
+                    {branch.address}
+                  </div>
+                </div>
               </>
             ) : (
               <>
-                <p>
-                  Bằng bản này : <span className="text-gray-400">[Chưa chọn showroom]</span>
-                </p>
-                <p>
-                  Địa chỉ: <span className="text-gray-400">[Chưa có địa chỉ]</span>
-                </p>
+                <div className="info-row grid-cols-[120px_1fr]">
+                  <span className="info-label w-[120px]">Bằng bản này:</span>
+                  <div className="info-value text-gray-400">
+                    [Chưa chọn showroom]
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[120px_1fr]">
+                  <span className="info-label w-[120px]">Địa chỉ:</span>
+                  <div className="info-value text-gray-400">
+                    [Chưa có địa chỉ]
+                  </div>
+                </div>
               </>
             )}
 
-            <p>
+            <p className="mt-4 mb-4">
               Xác nhận tặng bảo hiểm vật chất xe cho khách{" "}
               <strong>{data.customerName}</strong> theo hợp đồng mua bán số{" "}
               {data.contractNumber} được kí ngày {data.createdAt}.
             </p>
 
-            <div className="space-y-2">
-              <p>
-                Người được bảo hiểm: <strong>{data.customerName}</strong>
-              </p>
-              <p>
-                Địa chỉ: <strong>{data.customerAddress || ""}</strong>
-              </p>
-              <p>
-                Hiệu xe: <strong>{data?.model || ""}</strong>
-              </p>
-              <p>
-                Số khung: <strong>{data?.vin || ""}</strong>
-              </p>
-              <p>
-                Số máy: <strong>{data?.engineNumber || ""}</strong>
-              </p>
-              <p>
-                Giá trị xe : <strong>{formatCurrency(data?.vehicleValue || "")}</strong>
-              </p>
-              <p>
-                Giá trị hợp đồng bảo hiểm :{" "}
-                <strong>
+            <div className="space-y-1 mt-4">
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Người được bảo hiểm:</span>
+                <div className="info-value font-bold uppercase">{data.customerName}</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Địa chỉ:</span>
+                <div className="info-value font-bold">{data.customerAddress || ""}</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Hiệu xe:</span>
+                <div className="info-value font-bold">{data?.model || ""}</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Số khung:</span>
+                <div className="info-value font-bold uppercase">{data?.vin || ""}</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Số máy:</span>
+                <div className="info-value font-bold uppercase">{data?.engineNumber || ""}</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Giá trị xe:</span>
+                <div className="info-value font-bold">{formatCurrency(data?.vehicleValue || "")} vnđ</div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Giá trị hợp đồng bảo hiểm:</span>
+                <div className="info-value font-bold">
                   <span className="print:hidden">
                     <input
                       type="text"
                       value={insuranceValue}
-                      onChange={(e) => setInsuranceValue(e.target.value)}
-                      className="border-b border-gray-400 px-2 py-1 text-sm font-normal w-full max-w-md focus:outline-none focus:border-blue-500"
+                      onChange={(e) => setInsuranceValue(e.target.value)}       
+                      className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-full max-w-md focus:outline-none focus:border-blue-500"
                       placeholder={data.insuranceValue}
                     />
                   </span>
                   <span className="hidden print:inline">
-                    {formatCurrency(insuranceValue || data.insuranceValue)}
+                    {formatCurrency(insuranceValue || data.insuranceValue)} vnđ
                   </span>
-                </strong>
-              </p>
-              <p>
-                Số hợp đồng bảo hiểm :{" "}
-                <strong>
+                </div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Số hợp đồng bảo hiểm:</span>
+                <div className="info-value font-bold">
                   <span className="print:hidden">
                     <input
                       type="text"
                       value={insuranceContract}
-                      onChange={(e) => setInsuranceContract(e.target.value)}
-                      className="border-b border-gray-400 px-2 py-1 text-sm font-normal w-full max-w-md focus:outline-none focus:border-blue-500"
+                      onChange={(e) => setInsuranceContract(e.target.value)}    
+                      className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-full max-w-md focus:outline-none focus:border-blue-500"
                       placeholder={data.insuranceContract}
                     />
                   </span>
                   <span className="hidden print:inline">
                     {insuranceContract || data.insuranceContract}
                   </span>
-                </strong>
-              </p>
-              <p>
-                Thời hạn bảo hiểm{" "}
-                <strong>
+                </div>
+              </div>
+              <div className="info-row grid-cols-[200px_1fr]">
+                <span className="info-label w-[200px]">Thời hạn bảo hiểm:</span>
+                <div className="info-value font-bold">
                   Từ{" "}
                   <span className="print:hidden inline-flex items-center gap-1">
                     <input
@@ -489,8 +508,8 @@ const GiayXacNhanTangBaoHiem = () => {
                     <input
                       type="date"
                       value={insuranceStart}
-                      onChange={(e) => setInsuranceStart(e.target.value)}
-                      className="border-b border-gray-400 px-2 py-1 text-sm font-normal w-auto max-w-md focus:outline-none focus:border-blue-500"
+                      onChange={(e) => setInsuranceStart(e.target.value)}       
+                      className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-auto max-w-md focus:outline-none focus:border-blue-500"
                     />
                   </span>
                   <span className="hidden print:inline">
@@ -528,29 +547,25 @@ const GiayXacNhanTangBaoHiem = () => {
                       type="date"
                       value={insuranceEnd}
                       onChange={(e) => setInsuranceEnd(e.target.value)}
-                      className="border-b border-gray-400 px-2 py-1 text-sm font-normal w-auto max-w-md focus:outline-none focus:border-blue-500"
+                      className="border-b border-gray-400 px-2 py-1 text-sm font-bold w-auto max-w-md focus:outline-none focus:border-blue-500"
                     />
                   </span>
                   <span className="hidden print:inline">
                     {formatDateDisplay(insuranceEnd) || formatDateDisplay(data?.insuranceEnd) || ""}
                   </span>
-                </strong>
-              </p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Signature Section */}
-          <div className="mt-12 flex justify-end">
-            <div className="w-78">
-              {" "}
-              {/* Điều chỉnh chiều rộng này nếu cần */}
-              <p className="italic text-right">
+          <div className="mt-12 flex justify-end signature-block">
+            <div className="w-78 text-center">
+              <p className="italic text-right mb-4">
                 TP. Hồ Chí Minh, ngày {today.getDate()} tháng{" "}
                 {today.getMonth() + 1} năm {today.getFullYear()}
               </p>
-              <div className="mt-4 text-center">
-                <p className="font-bold">TỔNG GIÁM ĐỐC</p>
-              </div>
+              <p className="font-bold signer-title uppercase">TỔNG GIÁM ĐỐC</p>
             </div>
           </div>
         </div>
@@ -573,60 +588,6 @@ const GiayXacNhanTangBaoHiem = () => {
           </button>
         </div>
       </div>
-
-      <style>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 8mm;
-          }
-
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-
-          .min-h-screen {
-            min-height: 0 !important;
-            height: auto !important;
-          }
-
-          #printable-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 194mm !important;
-            min-height: 0 !important;
-            height: auto !important;
-            max-height: 281mm !important;
-            overflow: hidden !important;
-            padding: 5mm !important;
-            margin: 0 !important;
-            background: white !important;
-            font-family: 'Times New Roman', Times, serif !important;
-            font-size: 11pt !important;
-            line-height: 1.3 !important;
-            box-sizing: border-box !important;
-          }
-
-          .print\\:hidden {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

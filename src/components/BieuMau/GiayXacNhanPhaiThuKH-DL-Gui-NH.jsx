@@ -8,6 +8,7 @@ import {
 } from "../../data/branchData";
 import { vndToWords } from "../../utils/vndToWords";
 import { formatCurrency, formatDate } from "../../utils/formatting";
+import { PrintStyles } from "./PrintStyles";
 
 const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
   const location = useLocation();
@@ -70,22 +71,22 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
       if (location.state?.firebaseKey) {
         try {
           const contractId = location.state.firebaseKey;
-          
+
           // Thử load từ exportedContracts trước (dữ liệu mới nhất)
           const exportedContractsRef = ref(database, `exportedContracts/${contractId}`);
           const exportedSnapshot = await get(exportedContractsRef);
-          
+
           if (exportedSnapshot.exists()) {
             contractData = exportedSnapshot.val();
-            console.log("Loaded from exportedContracts:", contractData);
+            console.log("Loaded from exportedContracts:", contractData);        
             if (contractData.showroom) {
               showroomName = contractData.showroom;
               showroomLoadedFromContracts = true;
               console.log("Showroom loaded from exportedContracts:", showroomName);
             }
           } else {
-            // Nếu không có trong exportedContracts, thử load từ contracts
-            const contractsRef = ref(database, `contracts/${contractId}`);
+            // Nếu không có trong exportedContracts, thử load từ contracts      
+            const contractsRef = ref(database, `contracts/${contractId}`);      
             const snapshot = await get(contractsRef);
             if (snapshot.exists()) {
               contractData = snapshot.val();
@@ -93,7 +94,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
               if (contractData.showroom) {
                 showroomName = contractData.showroom;
                 showroomLoadedFromContracts = true;
-                console.log("Showroom loaded from contracts:", showroomName);
+                console.log("Showroom loaded from contracts:", showroomName);   
               }
             } else {
               console.log("Contract not found in both exportedContracts and contracts paths");
@@ -126,7 +127,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
         setNganHang(branchInfo.bankName || "");
         setChiNhanh(branchInfo.bankBranch || "");
         setChuTaiKhoan(branchInfo.representativeName || "");
-        setCongTyTaiKhoan(branchInfo.accountHolder || branchInfo.name || "");
+        setCongTyTaiKhoan(branchInfo.accountHolder || branchInfo.name || "");   
       } else {
         // Reset thông tin công ty khi không có branch
         setCongTy("");
@@ -158,7 +159,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
 
         // Model xe
         const model =
-          dataSource.model || dataSource.dongXe || dataSource["Dòng xe"] || "";
+          dataSource.model || dataSource.dongXe || dataSource["Dòng xe"] || ""; 
         if (model) setModelXe(model);
 
         // Số hợp đồng (mã hợp đồng)
@@ -227,7 +228,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
         }
 
         // Thông tin ngân hàng (nếu có)
-        if (dataSource.bankAccount) setSoTaiKhoan(dataSource.bankAccount);
+        if (dataSource.bankAccount) setSoTaiKhoan(dataSource.bankAccount);      
         if (dataSource.bankName) setNganHang(dataSource.bankName);
         if (dataSource.bankBranch) setChiNhanh(dataSource.bankBranch);
       } else {
@@ -250,7 +251,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
   if (loading) {
     return (
       <div
-        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        className="min-h-screen bg-gray-50 flex items-center justify-center"    
         style={{ fontFamily: "Times New Roman" }}
       >
         <div className="text-center">
@@ -266,15 +267,16 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
       className="min-h-screen bg-gray-50 p-8 print:p-0 print:m-0 print:bg-white print:min-h-0"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
       <div className="max-w-4xl mx-auto print:max-w-none print:mx-0">
         <div className="bg-white p-12 print:p-0 print:bg-white print:shadow-none text-[14px] print:text-[14px]" id="printable-content">
           {/* Header */}
           <div className="text-center mb-2">
-            <p className="font-bold">
-              Cộng Hòa – Xã Hội – Chủ Nghĩa – Việt Nam
+            <p className="font-bold uppercase">
+              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
             </p>
             <p className="font-bold">Độc lập – Tự do – Hạnh Phúc</p>
-            <p className="mt-2">**********</p>
+            <div className="border-b border-gray-800 w-40 mx-auto mt-1"></div>  
           </div>
 
           <div className="text-right mb-4 italic">
@@ -286,7 +288,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                 className="border-b border-gray-400 px-1 w-40 text-center focus:outline-none focus:border-blue-500"
               />
             </span>
-            <span className="hidden print:inline">{tpHCM}</span>, ngày{" "}
+            <span className="hidden print:inline">{tpHCM}</span>, ngày{" "}     
             <span className="print:hidden">
               <input
                 type="text"
@@ -295,7 +297,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                 className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
               />
             </span>
-            <span className="hidden print:inline">{ngay}</span> tháng{" "}
+            <span className="hidden print:inline">{ngay}</span> tháng{" "}      
             <span className="print:hidden">
               <input
                 type="text"
@@ -304,7 +306,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                 className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
               />
             </span>
-            <span className="hidden print:inline">{thang}</span> năm{" "}
+            <span className="hidden print:inline">{thang}</span> năm{" "}       
             <span className="print:hidden">
               <input
                 type="text"
@@ -317,7 +319,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-center text-[20px] font-bold mb-8">
+          <h1 className="text-center text-[20px] font-bold mb-8 uppercase">
             GIẤY XÁC NHẬN CÔNG NỢ
           </h1>
 
@@ -325,8 +327,9 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
           <div className="mb-3 space-y-1">
             {branch ? (
               <>
-                <p>
-                  <span className="print:hidden">
+                <div className="flex">
+                  <span className="hidden print:inline font-bold flex-grow uppercase">{congTy}</span>
+                  <span className="print:hidden flex-grow uppercase">
                     <input
                       type="text"
                       value={congTy}
@@ -334,68 +337,77 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                       className="border-b border-gray-400 font-bold uppercase px-1 w-full focus:outline-none focus:border-blue-500"
                     />
                   </span>
-                  <span className="hidden print:inline font-bold">{congTy}</span>
-                </p>
-                <p>
-                  Địa chỉ trụ sở chính:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={diaChiTruSo}
-                      onChange={(e) => setDiaChiTruSo(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{diaChiTruSo}</span>
-                </p>
-                <p>
-                  Mã số doanh nghiệp:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={maSoDN}
-                      onChange={(e) => setMaSoDN(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{maSoDN}</span>
-                </p>
-                <p>
-                  Đại diện:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={daiDien}
-                      onChange={(e) => setDaiDien(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{daiDien}</span>
-                </p>
-                <p>
-                  Chức vụ:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={chucVu}
-                      onChange={(e) => setChucVu(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{chucVu}</span>
-                </p>
-                <p>
-                  (Theo giấy ủy quyền số{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={giayUyQuyen}
-                      onChange={(e) => setGiayUyQuyen(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{giayUyQuyen}</span>)
-                </p>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Địa chỉ trụ sở chính:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={diaChiTruSo}
+                        onChange={(e) => setDiaChiTruSo(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{diaChiTruSo}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Mã số doanh nghiệp:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={maSoDN}
+                        onChange={(e) => setMaSoDN(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500 font-bold"
+                      />
+                    </span>
+                    <span className="hidden print:inline font-bold">{maSoDN}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Đại diện:</span>        
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={daiDien}
+                        onChange={(e) => setDaiDien(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{daiDien}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Chức vụ:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={chucVu}
+                        onChange={(e) => setChucVu(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{chucVu}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">(Theo giấy ủy quyền số:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={giayUyQuyen}
+                        onChange={(e) => setGiayUyQuyen(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{giayUyQuyen}</span>)
+                  </div>
+                </div>
               </>
             ) : (
               <p className="text-gray-500 italic">[Chưa chọn showroom - Thông tin công ty sẽ hiển thị khi chọn showroom]</p>
@@ -413,11 +425,11 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   type="text"
                   value={soHopDong}
                   onChange={(e) => setSoHopDong(e.target.value)}
-                  className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500 font-bold"
                   placeholder="Nhập số hợp đồng"
                 />
               </span>
-              <span className="hidden print:inline">
+              <span className="hidden print:inline font-bold">
                 {soHopDong || "______"}
               </span>{" "}
               ký ngày{" "}
@@ -426,11 +438,11 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   type="text"
                   value={ngayKyHopDong}
                   onChange={(e) => setNgayKyHopDong(e.target.value)}
-                  className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500 font-bold"
                   placeholder="Nhập ngày ký"
                 />
               </span>
-              <span className="hidden print:inline">
+              <span className="hidden print:inline font-bold">
                 {ngayKyHopDong || "______"}
               </span>{" "}
               giữa{" "}
@@ -440,13 +452,11 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   value={congTy}
                   onChange={(e) => setCongTy(e.target.value)}
                   className="border-b border-gray-400 px-1 font-bold w-64 focus:outline-none focus:border-blue-500"
-                  style={{ textTransform: "none" }}
                   placeholder="Công ty"
                 />
               </span>
               <span
-                className="hidden print:inline font-bold"
-                style={{ textTransform: "none" }}
+                className="hidden print:inline font-bold uppercase"
               >
                 {congTy || "[Chưa chọn showroom]"}
               </span>{" "}
@@ -457,21 +467,21 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   type="text"
                   value={ongBa}
                   onChange={(e) => setOngBa(e.target.value)}
-                  className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500 font-bold uppercase"
                 />
               </span>
-              <span className="hidden print:inline">{ongBa}</span> về việc mua
+              <span className="hidden print:inline font-bold uppercase">{ongBa}</span> về việc mua  
               bán xe{" "}
               <span className="print:hidden">
                 <input
                   type="text"
                   value={modelXe}
                   onChange={(e) => setModelXe(e.target.value)}
-                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold uppercase"
                   placeholder="Nhập model xe"
                 />
               </span>
-              <span className="hidden print:inline">{modelXe || "______"}</span>{" "}
+              <span className="hidden print:inline font-bold uppercase">{modelXe || "______"}</span>{" "}
               với giá trị hợp đồng{" "}
               <span className="print:hidden">
                 <input
@@ -491,7 +501,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                 <input
                   type="text"
                   value={giaTriHopDongBangChu}
-                  onChange={(e) => setGiaTriHopDongBangChu(e.target.value)}
+                  onChange={(e) => setGiaTriHopDongBangChu(e.target.value)}     
                   className="border-b border-gray-400 px-1 w-full font-bold italic focus:outline-none focus:border-blue-500"
                   placeholder="Nhập bằng chữ"
                 />
@@ -505,14 +515,12 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   type="text"
                   value={congTy}
                   onChange={(e) => setCongTy(e.target.value)}
-                  className="border-b border-gray-400 px-1 font-bold w-auto focus:outline-none focus:border-blue-500"
-                  style={{ textTransform: "none" }}
+                  className="border-b border-gray-400 px-1 font-bold w-auto focus:outline-none focus:border-blue-500 uppercase"
                   placeholder="Công ty"
                 />
               </span>
               <span
-                className="hidden print:inline font-bold"
-                style={{ textTransform: "none" }}
+                className="hidden print:inline font-bold uppercase"
               >
                 {congTy || "[Chưa chọn showroom]"}
               </span>{" "}
@@ -522,10 +530,10 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                   type="text"
                   value={ongBa}
                   onChange={(e) => setOngBa(e.target.value)}
-                  className="border-b border-gray-400 px-1 w-auto focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-auto focus:outline-none focus:border-blue-500 font-bold uppercase"
                 />
               </span>
-              <span className="hidden print:inline">{ongBa}</span> còn phải
+              <span className="hidden print:inline font-bold uppercase">{ongBa}</span> còn phải     
               thanh toán số tiền còn lại là{" "}
               <span className="print:hidden">
                 <input
@@ -536,11 +544,11 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                     setSoTienConLai(formatCurrency(val));
                     setSoTienBangChu(vndToWords(val));
                   }}
-                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold"
                   placeholder="Nhập số tiền"
                 />
               </span>
-              <span className="hidden print:inline">
+              <span className="hidden print:inline font-bold">
                 {soTienConLai || "______"} VNĐ
               </span>{" "}
               <em className="font-bold">(Bằng chữ:</em>{" "}
@@ -556,7 +564,7 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
               <span className="hidden print:inline font-bold italic">
                 {soTienBangChu || "______"}
               </span>
-              <strong>)</strong>. Số tiền Khách Hàng vay Ngân hàng để thanh
+              <strong>)</strong>. Số tiền Khách Hàng vay Ngân hàng để thanh     
               toán:{" "}
               <span className="print:hidden">
                 <input
@@ -578,11 +586,11 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
                       setSoTienVayBangChu("");
                     }
                   }}
-                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                  className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold"
                   placeholder="Nhập số tiền vay"
                 />
               </span>
-              <span className="hidden print:inline">
+              <span className="hidden print:inline font-bold">
                 {soTienVay || "______"} VNĐ
               </span>{" "}
               <em className="font-bold">(Bằng chữ:</em>{" "}
@@ -598,66 +606,74 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
               <span className="hidden print:inline font-bold italic">
                 {soTienVayBangChu || "______"}
               </span>
-              <strong>)</strong>. Dựa theo thông báo cho vay đã phê duyệt, kính
+              <strong>)</strong>. Dựa theo thông báo cho vay đã phê duyệt, kính 
               đề nghị quý ngân hàng giải ngân số tiền còn lại theo thông báo cho
               vay theo thông tin số tài khoản dưới đây
             </p>
           </div>
 
           {/* Bank Info */}
-          <div className="mb-6 space-y-2">
+          <div className="mb-6 space-y-1">
             {branch ? (
               <>
-                <p>
-                  Số tài khoản:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={soTaiKhoan}
-                      onChange={(e) => setSoTaiKhoan(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{soTaiKhoan}</span>
-                </p>
-                <p>
-                  Ngân hàng{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={nganHang}
-                      onChange={(e) => setNganHang(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{nganHang}</span>
-                </p>
-                <p>
-                  Chi nhánh:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={chiNhanh}
-                      onChange={(e) => setChiNhanh(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">{chiNhanh}</span>
-                </p>
-                <p>
-                  Chủ tài khoản:{" "}
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={congTyTaiKhoan}
-                      onChange={(e) => setCongTyTaiKhoan(e.target.value)}
-                      className="border-b border-gray-400 px-1 w-[70%] focus:outline-none focus:border-blue-500"
-                    />
-                  </span>
-                  <span className="hidden print:inline">
-                    {congTyTaiKhoan || "______"}
-                  </span>
-                </p>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Số tài khoản:</span>    
+                  <div className="info-value font-bold">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={soTaiKhoan}
+                        onChange={(e) => setSoTaiKhoan(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{soTaiKhoan}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Ngân hàng:</span>        
+                  <div className="info-value font-bold">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={nganHang}
+                        onChange={(e) => setNganHang(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{nganHang}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Chi nhánh:</span>       
+                  <div className="info-value font-bold">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={chiNhanh}
+                        onChange={(e) => setChiNhanh(e.target.value)}
+                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
+                      />
+                    </span>
+                    <span className="hidden print:inline">{chiNhanh}</span>
+                  </div>
+                </div>
+                <div className="info-row grid-cols-[150px_1fr]">
+                  <span className="info-label w-[150px]">Chủ tài khoản:</span>   
+                  <div className="info-value font-bold uppercase">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={congTyTaiKhoan}
+                        onChange={(e) => setCongTyTaiKhoan(e.target.value)}       
+                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500 uppercase"
+                      />
+                    </span>
+                    <span className="hidden print:inline">
+                      {congTyTaiKhoan || "______"}
+                    </span>
+                  </div>
+                </div>
               </>
             ) : (
               <p className="text-gray-500 italic">[Thông tin ngân hàng sẽ hiển thị khi chọn showroom]</p>
@@ -667,11 +683,37 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
           <p className="mb-3">Xin chân thành cảm ơn!</p>
 
           {/* Signature */}
-          <div className="flex w-full">
-            <div className="w-1/2"></div>
-            <div className="w-1/2">
-              <p className="font-bold mb-1 text-center">CÔNG TY XÁC NHẬN</p>
-              <p className="italic mb-20 text-center">(Ký tên, Đóng dấu)</p>
+          <div className="flex w-full justify-between mt-12 signature-block">
+            <div className="w-1/2 text-center">
+              <p className="font-bold mb-1 signer-title uppercase">XÁC NHẬN CỦA NGÂN HÀNG</p>
+              <p className="italic mb-20">(Ký tên, Đóng dấu)</p>
+              <p className="font-bold uppercase">
+                <span className="print:hidden">
+                  <input
+                    type="text"
+                    value="" // This will be dynamic in a real app
+                    className="border-b border-gray-800 px-1 w-64 text-center focus:outline-none focus:border-blue-500"
+                    placeholder="[Tên Ngân hàng]"
+                  />
+                </span>
+                <span className="hidden print:inline">[Tên Ngân hàng]</span>    
+              </p>
+            </div>
+            <div className="w-1/2 text-center">
+              <p className="font-bold mb-1 signer-title uppercase">ĐẠI DIỆN THEO PHÁP LUẬT CỦA CÔNG TY</p>
+              <p className="italic mb-20">(Ký tên, Đóng dấu)</p>
+              <p className="font-bold uppercase">
+                <span className="print:hidden">
+                  <input
+                    type="text"
+                    value={daiDien}
+                    onChange={(e) => setDaiDien(e.target.value)}
+                    className="border-b border-gray-800 px-1 w-64 text-center focus:outline-none focus:border-blue-500"
+                    placeholder="[Họ và tên]"
+                  />
+                </span>
+                <span className="hidden print:inline">{daiDien}</span>
+              </p>
             </div>
           </div>
         </div>
@@ -692,78 +734,6 @@ const GiayXacNhanPhaiThuKH_DL_Gui_NH = () => {
           In Giấy Xác Nhận
         </button>
       </div>
-
-      <style>{`
-        @media print {
-          @page {
-            margin: 15mm 10mm;
-            size: A4;
-          }
-          * {
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-          #printable-content {
-            position: static !important;
-            left: auto !important;
-            top: auto !important;
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            font-family: 'Times New Roman', Times, serif !important;
-            font-size: 14px !important;
-            line-height: 1.4 !important;
-            page-break-after: avoid !important;
-            background: white !important;
-            border: none !important;
-            box-shadow: none !important;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            font-family: 'Times New Roman', Times, serif !important;
-            height: auto !important;
-            overflow: visible !important;
-            background: white !important;
-          }
-          .min-h-screen {
-            min-height: auto !important;
-            background: white !important;
-          }
-          .bg-gray-50, .bg-white {
-            background: white !important;
-          }
-          .max-w-4xl {
-            max-width: none !important;
-          }
-          .mx-auto {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-          }
-          .p-8, .p-12 {
-            padding: 0 !important;
-          }
-          div, p, span, input {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

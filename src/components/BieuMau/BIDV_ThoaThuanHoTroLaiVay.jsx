@@ -7,6 +7,7 @@ import {
   getDefaultBranch,
 } from "../../data/branchData";
 import vinfastLogo from "../../assets/vinfast.svg";
+import { PrintStyles } from "./PrintStyles";
 
 const BIDV_ThoaThuanHoTroLaiVay = () => {
   const location = useLocation();
@@ -76,22 +77,22 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
       if (location.state?.firebaseKey) {
         try {
           const contractId = location.state.firebaseKey;
-          
+
           // Thử load từ exportedContracts trước (dữ liệu mới nhất)
           const exportedContractsRef = ref(database, `exportedContracts/${contractId}`);
           const exportedSnapshot = await get(exportedContractsRef);
-          
+
           if (exportedSnapshot.exists()) {
             contractData = exportedSnapshot.val();
-            console.log("Loaded from exportedContracts:", contractData);
+            console.log("Loaded from exportedContracts:", contractData);        
             if (contractData.showroom) {
               showroomName = contractData.showroom;
               showroomLoadedFromContracts = true;
               console.log("Showroom loaded from exportedContracts:", showroomName);
             }
           } else {
-            // Nếu không có trong exportedContracts, thử load từ contracts
-            const contractsRef = ref(database, `contracts/${contractId}`);
+            // Nếu không có trong exportedContracts, thử load từ contracts      
+            const contractsRef = ref(database, `contracts/${contractId}`);      
             const snapshot = await get(contractsRef);
             if (snapshot.exists()) {
               contractData = snapshot.val();
@@ -99,7 +100,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
               if (contractData.showroom) {
                 showroomName = contractData.showroom;
                 showroomLoadedFromContracts = true;
-                console.log("Showroom loaded from contracts:", showroomName);
+                console.log("Showroom loaded from contracts:", showroomName);   
               }
             } else {
               console.log("Contract not found in both exportedContracts and contracts paths");
@@ -172,6 +173,14 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
           "";
         if (customerPhone) setDienThoaiKH(customerPhone);
 
+        // Mã số thuế
+        const taxCode =
+          dataSource.maSoThue ||
+          dataSource.taxCode ||
+          dataSource["Mã Số Thuế"] ||
+          "";
+        if (taxCode) setMaSoThue(taxCode);
+
         // CCCD - format với ngày cấp và nơi cấp
         const cccdNumber =
           dataSource.cccd ||
@@ -208,9 +217,9 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
 
         // Model xe
         const model =
-          dataSource.model || 
-          dataSource.dongXe || 
-          dataSource["Dòng xe"] || 
+          dataSource.model ||
+          dataSource.dongXe ||
+          dataSource["Dòng xe"] ||
           dataSource.hieuxe ||
           "";
         if (model) setModel(model);
@@ -259,7 +268,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
   if (loading) {
     return (
       <div
-        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        className="min-h-screen bg-gray-50 flex items-center justify-center"    
         style={{ fontFamily: "Times New Roman" }}
       >
         <div className="text-center">
@@ -275,6 +284,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
       className="min-h-screen bg-gray-50 p-8"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
       <div className="max-w-4xl mx-auto print:max-w-4xl print:mx-auto">
         <div
           className="flex-1 bg-white p-8 print:pt-0 flex flex-col min-h-screen print:min-h-[calc(100vh-40mm)]"
@@ -283,7 +293,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
           {/* Logo */}
           <div className="text-center mb-6">
             <div className="w-32 mx-auto mb-4">
-              <img src={vinfastLogo} alt="VinFast Logo" className="w-full" />
+              <img src={vinfastLogo} alt="VinFast Logo" className="w-full" />   
             </div>
           </div>
 
@@ -303,7 +313,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                   className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
                 />
               </span>
-              <span className="hidden print:inline">{ngayKy}</span> tháng{" "}
+              <span className="hidden print:inline mx-1">{ngayKy}</span> tháng{" "}  
               <span className="print:hidden">
                 <input
                   type="text"
@@ -312,7 +322,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                   className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
                 />
               </span>
-              <span className="hidden print:inline">{thangKy}</span> năm{" "}
+              <span className="hidden print:inline mx-1">{thangKy}</span> năm{" "}   
               <span className="print:hidden">
                 <input
                   type="text"
@@ -321,7 +331,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                   className="border-b border-gray-400 px-1 w-16 text-center focus:outline-none focus:border-blue-500"
                 />
               </span>
-              <span className="hidden print:inline">{namKy}</span>, bởi và giữa:
+              <span className="hidden print:inline mx-1">{namKy}</span>, bởi và giữa:
             </p>
           </div>
 
@@ -337,117 +347,129 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                       <input
                         type="text"
                         value={congTyBenBan}
-                        onChange={(e) => setCongTyBenBan(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
+                        onChange={(e) => setCongTyBenBan(e.target.value)}       
+                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500 uppercase"
                       />
                     </span>
-                    <span className="hidden print:inline underline">
+                    <span className="hidden print:inline underline uppercase">
                       {congTyBenBan}
                     </span>
                   </p>
-                  <p className="mb-1">
-                    Địa chỉ trụ sở chính:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={diaChiTruSo}
-                        onChange={(e) => setDiaChiTruSo(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">
-                      {diaChiTruSo}
-                    </span>
-                  </p>
-                  <p className="mb-1">
-                    Mã số doanh nghiệp:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={maSoDN}
-                        onChange={(e) => setMaSoDN(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">{maSoDN}</span>
-                  </p>
-                  <p className="mb-1">
-                    Tài khoản:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={taiKhoan}
-                        onChange={(e) => setTaiKhoan(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">
-                      {taiKhoan}
-                    </span>{" "}
-                    tại Ngân hàng{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={nganHangBenBan}
-                        onChange={(e) => setNganHangBenBan(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">
-                      {nganHangBenBan}
-                    </span>
-                  </p>
-                  <p className="mb-1">
-                    Đại diện:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={daiDienBenBan}
-                        onChange={(e) => setDaiDienBenBan(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline">{daiDienBenBan}</span>
-                  </p>
-                  <p className="mb-1">
-                    Chức vụ:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={chucVuBenBan}
-                        onChange={(e) => setChucVuBenBan(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline">{chucVuBenBan}</span>
-                  </p>
-                  <p className="mb-2">
-                    (Theo Giấy uỷ quyền số{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={giayUyQuyen}
-                        onChange={(e) => setGiayUyQuyen(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">
-                      {giayUyQuyen}
-                    </span>{" "}
-                    ngày{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={ngayUyQuyen}
-                        onChange={(e) => setNgayUyQuyen(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline font-bold">
-                      {ngayUyQuyen}
-                    </span>
-                    )
-                  </p>
+                  <div className="space-y-1">
+                    <div className="info-row">
+                      <span className="info-label">Địa chỉ trụ sở chính:</span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={diaChiTruSo}
+                            onChange={(e) => setDiaChiTruSo(e.target.value)}        
+                            className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500 font-bold"
+                          />
+                        </span>
+                        <span className="hidden print:inline font-bold">
+                          {diaChiTruSo}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Mã số doanh nghiệp:</span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={maSoDN}
+                            onChange={(e) => setMaSoDN(e.target.value)}
+                            className="border-b border-gray-400 px-1 w-64 focus:outline-none focus:border-blue-500 font-bold"
+                          />
+                        </span>
+                        <span className="hidden print:inline font-bold">{maSoDN}</span>
+                      </div>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Tài khoản:</span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={taiKhoan}
+                            onChange={(e) => setTaiKhoan(e.target.value)}
+                            className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500 font-bold"
+                          />
+                        </span>
+                        <span className="hidden print:inline font-bold">
+                          {taiKhoan}
+                        </span>{" "}
+                        tại Ngân hàng{" "}
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={nganHangBenBan}
+                            onChange={(e) => setNganHangBenBan(e.target.value)}     
+                            className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold"
+                          />
+                        </span>
+                        <span className="hidden print:inline font-bold">
+                          {nganHangBenBan}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Đại diện:</span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={daiDienBenBan}
+                            onChange={(e) => setDaiDienBenBan(e.target.value)}      
+                            className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                          />
+                        </span>
+                        <span className="hidden print:inline">{daiDienBenBan}</span>
+                      </div>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Chức vụ:</span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={chucVuBenBan}
+                            onChange={(e) => setChucVuBenBan(e.target.value)}       
+                            className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                          />
+                        </span>
+                        <span className="hidden print:inline">{chucVuBenBan}</span> 
+                      </div>
+                    </div>
+                    <p className="mb-2">
+                      (Theo Giấy uỷ quyền số{" "}
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={giayUyQuyen}
+                          onChange={(e) => setGiayUyQuyen(e.target.value)}        
+                          className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500 font-bold"
+                        />
+                      </span>
+                      <span className="hidden print:inline font-bold">
+                        {giayUyQuyen}
+                      </span>{" "}
+                      ngày{" "}
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={ngayUyQuyen}
+                          onChange={(e) => setNgayUyQuyen(e.target.value)}        
+                          className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500 font-bold"
+                        />
+                      </span>
+                      <span className="hidden print:inline font-bold">
+                        {ngayUyQuyen}
+                      </span>
+                      )
+                    </p>
+                  </div>
                   <p className="mb-2 font-bold">("Bên Bán")</p>
                   <p className="font-bold mb-2">VÀ</p>
                 </>
@@ -457,122 +479,136 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
             </div>
 
             {/* Khách Hàng */}
-            <div>
-              <p className="mb-2">
-                <span className="font-normal">Ông/Bà: </span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={tenKhachHang}
-                    onChange={(e) => setTenKhachHang(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline font-normal">
-                  {tenKhachHang}
-                </span>
-              </p>
-              <p className="mb-1">
-                Địa chỉ:{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={diaChiKH}
-                    onChange={(e) => setDiaChiKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline font-bold">
-                  {diaChiKH}
-                </span>
-              </p>
-              <p className="mb-1">
-                Điện thoại:{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={dienThoaiKH}
-                    onChange={(e) => setDienThoaiKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline font-bold">
-                  {dienThoaiKH}
-                </span>
-              </p>
-              <p className="mb-1">
-                Mã số thuế:{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={maSoThue}
-                    onChange={(e) => setMaSoThue(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline font-bold">
-                  {maSoThue}
-                </span>
-              </p>
-              <p className="mb-1">
-                CMTND/TCC: Số{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={cmtnd}
-                    onChange={(e) => setCmtnd(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-40 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline font-bold">{cmtnd}</span>{" "}
-                cấp ngày{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={ngayCapCMT}
-                    onChange={(e) => setNgayCapCMT(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline">{ngayCapCMT}</span> bởi{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={noiCapCMT}
-                    onChange={(e) => setNoiCapCMT(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline">{noiCapCMT}</span>
-              </p>
-              <p className="mb-2">
-                Đại diện:{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={daiDienKH}
-                    onChange={(e) => setDaiDienKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline">{daiDienKH}</span>
-                {"    "}Chức vụ:{" "}
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={chucVuKH}
-                    onChange={(e) => setChucVuKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                  />
-                </span>
-                <span className="hidden print:inline">{chucVuKH}</span>
-              </p>
+            <div className="space-y-1">
+              <div className="info-row">
+                <span className="info-label font-normal">Ông/Bà:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={tenKhachHang}
+                      onChange={(e) => setTenKhachHang(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500"
+                    />
+                  </span>
+                  <span className="hidden print:inline font-normal">
+                    {tenKhachHang}
+                  </span>
+                </div>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Địa chỉ:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={diaChiKH}
+                      onChange={(e) => setDiaChiKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-full focus:outline-none focus:border-blue-500 font-bold"
+                    />
+                  </span>
+                  <span className="hidden print:inline font-bold">
+                    {diaChiKH}
+                  </span>
+                </div>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Điện thoại:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={dienThoaiKH}
+                      onChange={(e) => setDienThoaiKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold"
+                    />
+                  </span>
+                  <span className="hidden print:inline font-bold">
+                    {dienThoaiKH}
+                  </span>
+                </div>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Mã số thuế:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={maSoThue}
+                      onChange={(e) => setMaSoThue(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500 font-bold"
+                    />
+                  </span>
+                  <span className="hidden print:inline font-bold">
+                    {maSoThue}
+                  </span>
+                </div>
+              </div>
+              <div className="info-row">
+                <span className="info-label">CMTND/TCC:</span>
+                <div className="info-value">
+                  Số{" "}
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={cmtnd}
+                      onChange={(e) => setCmtnd(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-40 focus:outline-none focus:border-blue-500 font-bold"
+                    />
+                  </span>
+                  <span className="hidden print:inline font-bold">{cmtnd}</span>{" "}
+                  cấp ngày{" "}
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={ngayCapCMT}
+                      onChange={(e) => setNgayCapCMT(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-32 focus:outline-none focus:border-blue-500"
+                    />
+                  </span>
+                  <span className="hidden print:inline">{ngayCapCMT}</span> bởi{" "}
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={noiCapCMT}
+                      onChange={(e) => setNoiCapCMT(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                    />
+                  </span>
+                  <span className="hidden print:inline">{noiCapCMT}</span>        
+                </div>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Đại diện:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={daiDienKH}
+                      onChange={(e) => setDaiDienKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                    />
+                  </span>
+                  <span className="hidden print:inline">{daiDienKH}</span>        
+                  {"    "}
+                  <span className="ml-4 font-bold">Chức vụ:</span>{" "}
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={chucVuKH}
+                      onChange={(e) => setChucVuKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                    />
+                  </span>
+                  <span className="hidden print:inline">{chucVuKH}</span>
+                </div>
+              </div>
               <p className="mb-2 font-bold">("Khách Hàng")</p>
             </div>
 
             <p className="text-left leading-relaxed">
               Bên Bán và Khách Hàng sau đây được gọi riêng là{" "}
-              <strong>"Bên"</strong> và gọi chung là <strong>"Các Bên"</strong>
+              <strong>"Bên"</strong> và gọi chung là <strong>"Các Bên"</strong> 
             </p>
 
             {/* XÉT RẰNG */}
@@ -590,47 +626,53 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                       className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
                     />
                   </span>
-                  <span className="hidden print:inline">{soHopDong}</span> (sau
-                  đây gọi chung là "<strong>Hợp Đồng Mua Bán Xe</strong>") với
+                  <span className="hidden print:inline">{soHopDong}</span> (sau 
+                  đây gọi chung là "<strong>Hợp Đồng Mua Bán Xe</strong>") với  
                   thông tin về xe như sau:
                 </p>
-                <div className="ml-6">
-                  <p>
-                    - Model:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline">{model}</span>
-                  </p>
-                  <p>
-                    - Số Khung:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={soKhung}
-                        onChange={(e) => setSoKhung(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline">{soKhung}</span>
-                  </p>
-                  <p>
-                    - Số Máy:{" "}
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={soMay}
-                        onChange={(e) => setSoMay(e.target.value)}
-                        className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
-                      />
-                    </span>
-                    <span className="hidden print:inline">{soMay}</span>
-                  </p>
+                <div className="ml-6 space-y-1">
+                  <div className="info-row">
+                    <span className="info-label w-[100px] min-w-[100px]">- Model:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={model}
+                          onChange={(e) => setModel(e.target.value)}
+                          className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                        />
+                      </span>
+                      <span className="hidden print:inline">{model}</span>        
+                    </div>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label w-[100px] min-w-[100px]">- Số Khung:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={soKhung}
+                          onChange={(e) => setSoKhung(e.target.value)}
+                          className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                        />
+                      </span>
+                      <span className="hidden print:inline">{soKhung}</span>      
+                    </div>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label w-[100px] min-w-[100px]">- Số Máy:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={soMay}
+                          onChange={(e) => setSoMay(e.target.value)}
+                          className="border-b border-gray-400 px-1 w-48 focus:outline-none focus:border-blue-500"
+                        />
+                      </span>
+                      <span className="hidden print:inline">{soMay}</span>        
+                    </div>
+                  </div>
                 </div>
 
                 <p className="text-left leading-relaxed">
@@ -644,7 +686,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                       placeholder=".."
                     />
                   </span>
-                  <span className="hidden print:inline">{tuNgay}</span>/
+                  <span className="hidden print:inline">{tuNgay}</span>/        
                   <span className="print:hidden">
                     <input
                       type="text"
@@ -674,7 +716,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
               </p>
 
               <div className="ml-6 space-y-3">
-                <p className="font-bold">1.1. Chính sách Hỗ trợ lãi vay:</p>
+                <p className="font-bold">1.1. Chính sách Hỗ trợ lãi vay:</p>    
 
                 <div className="ml-6 space-y-2">
                   <p>
@@ -683,7 +725,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                       <input
                         type="text"
                         value={soTienVayToiDa}
-                        onChange={(e) => setSoTienVayToiDa(e.target.value)}
+                        onChange={(e) => setSoTienVayToiDa(e.target.value)}     
                         className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
                         placeholder="70"
                       />
@@ -705,7 +747,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                     - Lãi suất cho vay theo các quy định và điều kiện tại Chương Trình Hợp Tác (Đã bao gồm mức lãi suất hỗ trợ của Ngân Hàng so với Khách hàng thông thường); được tính trên dư nợ giảm dần;
                   </p>
                   <p className="text-left leading-relaxed">
-                    - VinFast sẽ hỗ trợ Khách Hàng một khoản tiền ("<strong>Khoản Hỗ Trợ Lãi Vay</strong>") tương đương khoản chênh lệch giữa (i) số tiền lãi của Ngân Hàng theo các quy định và điều kiện tại Chương Trình Hợp Tác và (ii) số tiền lãi mà Khách Hàng phải thanh toán, trong thời gian vay (tối đa bằng{" "}
+                    - VinFast sẽ hỗ trợ Khách Hàng một khoản tiền ("<strong>Khoản Hỗ Trợ Lãi Vay</strong>") tương đương khoản chênh lệch giữa (i) số tiền lãi của Ngân Hàng theo các quy định và điều kiện tại Chương Trình Hợp Tác và (ii) số tiền lãi mà Khách Hàng phải thanh toán, trong thời gian vay (tối đa bằng{" "}    
                     <span className="print:hidden">
                       <input
                         type="text"
@@ -715,7 +757,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                         placeholder="96"
                       />
                     </span>
-                    <span className="hidden print:inline">{thoiHanVay || "96"}</span> tháng) kể từ ngày bắt đầu tính lãi theo Hợp Đồng Tín Dụng ("<strong>Thời Hạn Hỗ Trợ Lãi Vay</strong>") hoặc cho đến khi Thời Hạn Hỗ Trợ Lãi Vay chấm dứt trước thời hạn theo quy định tại Thỏa Thuận này, tùy thời điểm nào đến trước.
+                    <span className="hidden print:inline">{thoiHanVay || "96"}</span> tháng) kể từ ngày bắt đầu tính lãi theo Hợp Đồng Tín Dụng ("<strong>Thời Hạn Hỗ Trợ Lãi Vay</strong>") hoặc cho đến khi Thời Hạn Hỗ Trợ Lãi Vay chấm dứt trước thời hạn theo quy định tại Thỏa Thuận này, tùy thời điểm nào đến trước.    
                   </p>
                   <p className="text-left leading-relaxed">
                     Số tiền gốc và lãi Khách Hàng thanh toán hàng tháng phương án gốc trả đều, lãi theo dư nợ giảm dần, trong đó lãi suất thực tế Khách Hàng phải chi trả như sau:
@@ -727,17 +769,17 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                         <input
                           type="text"
                           value={laiSuatUuDai}
-                          onChange={(e) => setLaiSuatUuDai(e.target.value)}
+                          onChange={(e) => setLaiSuatUuDai(e.target.value)}     
                           className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
                           placeholder="6,3"
                         />
                       </span>
-                      <span className="hidden print:inline">{laiSuatUuDai || "___"}</span>%/Năm. Trong trường hợp lãi suất thực tế tại ngân hàng thấp hơn{" "}
+                      <span className="hidden print:inline">{laiSuatUuDai || "___"}</span>%/Năm. Trong trường hợp lãi suất thực tế tại ngân hàng thấp hơn{" "}  
                       <span className="print:hidden">
                         <input
                           type="text"
                           value={laiSuatThapHon}
-                          onChange={(e) => setLaiSuatThapHon(e.target.value)}
+                          onChange={(e) => setLaiSuatThapHon(e.target.value)}   
                           className="border-b border-gray-400 px-1 w-12 text-center focus:outline-none focus:border-blue-500"
                           placeholder="6,3"
                         />
@@ -757,9 +799,12 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
                   Trong mọi trường hợp VinFast cũng như VinFast Trading không chịu trách nhiệm đối với bất kỳ mức lãi nào ngoài mức lãi quy định trên đây vì lý do Khách Hàng không tuân thủ các quy định của Ngân Hàng hay vì bất kỳ lý do gì không phải do lỗi của VinFast/VinFast Trading. Khách Hàng chịu trách nhiệm thanh toán với Ngân Hàng toàn bộ các khoản lãi và chi phí phát sinh trên mức hỗ trợ lãi vay của VinFast Trading quy định ở trên bao gồm các khoản phí trả nợ trước hạn; các khoản lãi quá hạn, lãi phạt do chậm thanh toán gốc, lãi; lãi tăng lên do Khách Hàng vi phạm nghĩa vụ trả nợ hoặc vi phạm nghĩa vụ khác; các khoản tiền hoàn trả ưu đãi do trả nợ trước hạn; tiền bồi thường vi phạm Hợp Đồng Tín Dụng.... VinFast cũng như VinFast Trading không có trách nhiệm thông báo, làm rõ, nhắc nợ hay thanh toán thay các khoản tiền này cho Khách Hàng.
                 </p>
 
-                <p className="font-bold mt-4">1.3. Thời Hạn Hỗ Trợ Lãi Vay:</p>
+                <p className="font-bold mt-4">1.3. Thời Hạn Hỗ Trợ Lãi Vay:</p> 
                 <p className="text-left leading-relaxed ml-6">
-                  Thời Hạn Hỗ Trợ Lãi Vay sẽ tự động chấm dứt trước hạn trong trường hợp Khách Hàng tất toán Khoản Giải Ngân trước hạn, hoặc trong trường hợp Hợp Đồng Tín Dụng chấm dứt trước khi hết Thời Hạn Hỗ Trợ Lãi Vay vì bất cứ lý do gì. Hết Thời Hạn Hỗ Trợ Lãi Vay hoặc khi Thời Hạn Hỗ Trợ Lãi Vay chấm dứt trước hạn, Khách Hàng có nghĩa vụ tiếp tục thực hiện trả nợ lãi cho Ngân Hàng theo đúng quy định tại Hợp Đồng Tín Dụng và quy định của Ngân Hàng.
+                  Thời Hạn Hỗ Trợ Lãi Vay sẽ tự động chấm dứt trước hạn trong trường hợp Khách Hàng tất toán Khoản Giải Ngân trước hạn, hoặc trong trường hợp Hợp Đồng Tín Dụng chấm dứt trước khi hết Thời Hạn Hỗ Trợ Lãi Vay vì bất cứ lý do gì. Hết Thời Hạn Hỗ Trợ Lãi Vay hoặc khi Thời Hạn Hỗ Trợ Lãi Vay chấm dứt trước hạn, Khách    
+                  Hàng có nghĩa vụ tiếp tục thực hiện trả nợ lãi cho Ngân Hàng  
+                  theo đúng quy định tại Hợp Đồng Tín Dụng và quy định của Ngân 
+                  Hàng.
                 </p>
               </div>
             </div>
@@ -775,7 +820,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
 
                 <div className="ml-6 space-y-2">
                   <p className="text-left leading-relaxed">
-                    a) Thực hiện kiểm tra, đối chiếu và xác nhận với Ngân Hàng các Khoản Hỗ Trợ Lãi Vay hỗ trợ cho Khách Hàng ngay trong ngày khi nhận được thông báo của Ngân Hàng có phát sinh các khoản vay của Khách Hàng thông qua email trước khi ký chính thức Thông báo thanh toán Khoản Hỗ Trợ Lãi Vay;
+                    a) Thực hiện kiểm tra, đối chiếu và xác nhận with Ngân Hàng các Khoản Hỗ Trợ Lãi Vay hỗ trợ cho Khách Hàng ngay trong ngày khi nhận được thông báo của Ngân Hàng có phát sinh các khoản vay của Khách Hàng thông qua email trước khi ký chính thức Thông báo thanh toán Khoản Hỗ Trợ Lãi Vay;
                   </p>
                   <p className="text-left leading-relaxed">
                     b) Thực hiện việc hỗ trợ Khoản Hỗ Trợ Lãi Vay của Khách Hàng theo Chính sách Hỗ trợ lãi vay theo Thỏa Thuận này;
@@ -791,7 +836,7 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
 
                 <div className="ml-6 space-y-2">
                   <p className="text-left leading-relaxed">
-                    a) Được VinFast Trading thực hiện việc hỗ trợ Khoản Hỗ Trợ Lãi Vay và áp dụng Chính sách Hỗ trợ lãi vay theo quy định của Thỏa Thuận này.
+                    a) Được VinFast Trading thực hiện việc hỗ trợ Khoản Hỗ Trợ Lãi Vay và áp dụng Chính sách Hỗ trợ lãi vay theo quy định của Thỏa Thuận này.   
                   </p>
                   <p className="text-left leading-relaxed">
                     b) Tự chi trả, thanh toán nợ gốc, phí trả nợ trước hạn và bất kỳ khoản lãi, lãi quá hạn nào phát sinh ngoài phạm vi Khoản Hỗ Trợ Lãi Vay, Thời Hạn Hỗ Trợ Lãi Vay và Chính sách Hỗ trợ lãi vay.
@@ -819,20 +864,20 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
 
               <div className="ml-6 space-y-2">
                 <p className="text-left leading-relaxed">
-                  a. Khách Hàng cho phép Ngân Hàng thu thập, xử lý các thông tin về xe, vị trí xe, tình trạng xe cho mục đích quản lý tài sản đảm bảo cho khoản vay theo Hợp Đồng Tín Dụng thông qua bên thứ ba là Đơn Vị Hỗ Trợ Kỹ Thuật
+                  a. Khách Hàng cho phép Ngân Hàng thu thập, xử lý các thông tin về xe, vị trí xe, tình trạng xe cho mục đích quản lý tài sản đảm bảo cho khoản vay theo Hợp Đồng Tín Dụng thông qua bên thứ ba là Đơn Vị Hỗ Trợ Kỹ Thuật       
                 </p>
                 <p className="text-left leading-relaxed">
                   b. Trong trường hợp Khách Hàng vi phạm nghĩa vụ trả nợ quá 60 ngày, Ngân Hàng có quyền đề nghị VinFast Trading, nhà sản xuất xe và/ hoặc bất kỳ bên thứ ba khác được VinFast Trading ủy quyền (gọi chung là "<strong>Đơn Vị Hỗ Trợ Kỹ Thuật</strong>") trích xuất dữ liệu định vị xe của Khách Hàng và Khách Hàng đồng ý để Đơn Vị Hỗ Trợ Kỹ Thuật thu thập, xử lý, cung cấp và chia sẻ dữ liệu này cho Ngân Hàng để phục vụ hoạt động xử lý thu hồi nợ;
                 </p>
                 <p className="text-left leading-relaxed">
-                  c. Trong trường hợp Khách Hàng vi phạm nghĩa vụ trả nợ quá 90 ngày, Ngân Hàng có quyền ủy quyền cho Đơn Vị Hỗ Trợ Kỹ Thuật kích hoạt tính năng giới hạn mức SOC (dung lượng pin) của pin tại ngưỡng 30% theo đề nghị của Ngân Hàng, và Khách Hàng đồng ý để Đơn Vị Hỗ Trợ Kỹ Thuật thực hiện các việc này;
+                  c. Trong trường hợp Khách Hàng vi phạm nghĩa vụ trả nợ quá 90 ngày, Ngân Hàng có quyền ủy quyền cho Đơn Vị Hỗ Trợ Kỹ Thuật kích hoạt tính năng giới hạn mức SOC (dung lượng pin) của pin tại ngưỡng 30% theo đề nghị của Ngân Hàng, và Khách Hàng đồng ý để Đơn Vị Hỗ Trợ Kỹ Thuật thực hiện các việc này;    
                 </p>
               </div>
             </div>
 
             {/* ĐIỀU 4 */}
             <div className="mt-6">
-              <p className="font-bold mb-3">Điều 4. Hiệu lực của Thỏa Thuận</p>
+              <p className="font-bold mb-3">Điều 4. Hiệu lực của Thỏa Thuận</p> 
 
               <div className="ml-6 space-y-2">
                 <p className="text-left leading-relaxed">
@@ -855,15 +900,15 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
           </div>
 
           {/* Signature */}
-          <div className="mt-16">
+          <div className="mt-16 signature-block">
             <table className="w-full text-sm">
               <tbody>
                 <tr>
                   <td className="text-center font-bold p-4 w-1/2 border-r border-black">
-                    <p className="mb-20">ĐẠI DIỆN BÊN BÁN</p>
+                    <p className="mb-20 signer-title">ĐẠI DIỆN BÊN BÁN</p>
                   </td>
                   <td className="text-center font-bold p-4 w-1/2">
-                    <p className="mb-20">KHÁCH HÀNG</p>
+                    <p className="mb-20 signer-title">KHÁCH HÀNG</p>
                   </td>
                 </tr>
               </tbody>
@@ -887,37 +932,6 @@ const BIDV_ThoaThuanHoTroLaiVay = () => {
           In Thỏa Thuận
         </button>
       </div>
-
-      <style>{`
-        @media print {
-          @page {
-            margin: 15mm 20mm 15mm 20mm;
-          }
-          body * {
-            visibility: hidden;
-          }
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-          #printable-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            padding: 0 !important;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

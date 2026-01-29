@@ -9,6 +9,7 @@ import { database } from "../../firebase/config";
 import { vndToWords } from "../../utils/vndToWords";
 import { formatCurrency, formatDate } from "../../utils/formatting";
 import CurrencyInput from "../shared/CurrencyInput";
+import { PrintStyles } from "./PrintStyles";
 
 const GiayThoaThuanTraThay = () => {
   const location = useLocation();
@@ -83,13 +84,13 @@ const GiayThoaThuanTraThay = () => {
           // Thử exportedContracts trước
           let contractRef = ref(database, `exportedContracts/${firebaseKey}`);
           let snapshot = await get(contractRef);
-          
+
           // Nếu không có trong exportedContracts, thử contracts
           if (!snapshot.exists()) {
             contractRef = ref(database, `contracts/${firebaseKey}`);
             snapshot = await get(contractRef);
           }
-          
+
           if (snapshot.exists()) {
             contractData = { ...snapshot.val(), firebaseKey };
           }
@@ -98,14 +99,14 @@ const GiayThoaThuanTraThay = () => {
         }
       }
 
-      // Get branch info - ưu tiên từ contractData, sau đó mới từ incoming
+      // Get branch info - ưu tiên từ contractData, sau đó mới từ incoming      
       let showroomName = "";
       if (contractData && contractData.showroom) {
         showroomName = contractData.showroom;
       } else {
         showroomName = incoming.showroom || incoming["Showroom"] || incoming.showroomName || "";
       }
-      
+
       const branchInfo = showroomName ? getBranchByShowroomName(showroomName) : null;
       setBranch(branchInfo);
 
@@ -135,18 +136,18 @@ const GiayThoaThuanTraThay = () => {
         // Customer info
         setTenKH(
           dataSource.customerName ||
-            dataSource["Tên KH"] ||
-            dataSource["Tên Kh"] ||
-            ""
+          dataSource["Tên KH"] ||
+          dataSource["Tên Kh"] ||
+          ""
         );
         setDiaChiKH(
           dataSource.address || dataSource["Địa Chỉ"] || dataSource.diaChi || ""
         );
         setDienThoaiKH(
           dataSource.phone ||
-            dataSource["Số Điện Thoại"] ||
-            dataSource.soDienThoai ||
-            ""
+          dataSource["Số Điện Thoại"] ||
+          dataSource.soDienThoai ||
+          ""
         );
         setMaSoThueKH(dataSource.maSoThue || dataSource["Mã Số Thuế"] || "");
         setSoCCCDKH(
@@ -154,15 +155,15 @@ const GiayThoaThuanTraThay = () => {
         );
         setNgayCapKH(
           dataSource.issueDate ||
-            dataSource.ngayCap ||
-            dataSource["Ngày Cấp"] ||
-            ""
+          dataSource.ngayCap ||
+          dataSource["Ngày Cấp"] ||
+          ""
         );
         setNoiCapKH(
           dataSource.issuePlace ||
-            dataSource.noiCap ||
-            dataSource["Nơi Cấp"] ||
-            ""
+          dataSource.noiCap ||
+          dataSource["Nơi Cấp"] ||
+          ""
         );
 
         // Spouse info (if available)
@@ -205,15 +206,15 @@ const GiayThoaThuanTraThay = () => {
         );
         setSoKhung(
           dataSource.soKhung ||
-            dataSource["Số Khung"] ||
-            dataSource.chassisNumber ||
-            ""
+          dataSource["Số Khung"] ||
+          dataSource.chassisNumber ||
+          ""
         );
         setSoMay(
           dataSource.soMay ||
-            dataSource["Số Máy"] ||
-            dataSource.engineNumber ||
-            ""
+          dataSource["Số Máy"] ||
+          dataSource.engineNumber ||
+          ""
         );
         const giaTri =
           dataSource.contractPrice ||
@@ -244,22 +245,22 @@ const GiayThoaThuanTraThay = () => {
           } else {
             setSoTienVayBangChu(
               dataSource.soTienVayBangChu ||
-                dataSource["Số Tiền Vay Bằng Chữ"] ||
-                ""
+              dataSource["Số Tiền Vay Bằng Chữ"] ||
+              ""
             );
           }
         }
         setTyLeVay(
           dataSource.tyLeVay ||
-            dataSource["Tỷ Lệ Vay"] ||
-            dataSource.loanRatio ||
-            ""
+          dataSource["Tỷ Lệ Vay"] ||
+          dataSource.loanRatio ||
+          ""
         );
         setLaiSuat(
           dataSource.laiSuat ||
-            dataSource["Lãi Suất"] ||
-            dataSource.interestRate ||
-            ""
+          dataSource["Lãi Suất"] ||
+          dataSource.interestRate ||
+          ""
         );
         setBienDo(
           dataSource.bienDo || dataSource["Biên Độ"] || dataSource.margin || ""
@@ -309,18 +310,12 @@ const GiayThoaThuanTraThay = () => {
     );
   }
 
-  const hasSpouse =
-    tenVoChong ||
-    diaChiVoChong ||
-    dienThoaiVoChong ||
-    maSoThueVoChong ||
-    soCCCDVoChong;
-
   return (
     <div
       className="min-h-screen bg-gray-50 p-8"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
       <div className="flex gap-6 max-w-4xl mx-auto print:max-w-4xl print:mx-auto">
         <div className="flex-1 bg-white" id="printable-content">
           {/* Title */}
@@ -393,92 +388,100 @@ const GiayThoaThuanTraThay = () => {
                   </span>
                   <span className="hidden print:inline ml-2">{congTy || ""}</span>
                 </h2>
-                <div className="text-sm space-y-2">
-                  <div>
-                    <span className="">Địa chỉ trụ sở chính:</span>
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={diaChiTruSo}
-                        onChange={(e) => setDiaChiTruSo(e.target.value)}
-                        className="border-b border-gray-400 px-2 py-1 text-sm w-full max-w-md ml-2 focus:outline-none focus:border-blue-500"
-                        placeholder="Nhập địa chỉ"
-                      />
-                    </span>
-                    <span className="hidden print:inline ml-2">
-                      {diaChiTruSo || "______"}
-                    </span>
+                <div className="text-sm space-y-1">
+                  <div className="info-row">
+                    <span className="info-label">Địa chỉ trụ sở chính:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={diaChiTruSo}
+                          onChange={(e) => setDiaChiTruSo(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập địa chỉ"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {diaChiTruSo || "______"}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="">Mã số doanh nghiệp:</span>
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={maSoDN}
-                        onChange={(e) => setMaSoDN(e.target.value)}
-                        className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                        placeholder="Nhập mã số doanh nghiệp"
-                      />
-                    </span>
-                    <span className="hidden print:inline ml-2">
-                      {maSoDN || "______"}
-                    </span>
+                  <div className="info-row">
+                    <span className="info-label">Mã số doanh nghiệp:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={maSoDN}
+                          onChange={(e) => setMaSoDN(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập mã số doanh nghiệp"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {maSoDN || "______"}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="">Tài khoản:</span>
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={taiKhoan}
-                        onChange={(e) => setTaiKhoan(e.target.value)}
-                        className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
-                        placeholder="____"
-                      />
-                    </span>
-                    <span className="hidden print:inline mx-1">
-                      {taiKhoan || "____"}
-                    </span>
-                    tại Ngân hàng
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={nganHang}
-                        onChange={(e) => setNganHang(e.target.value)}
-                        className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
-                        placeholder="____"
-                      />
-                    </span>
-                    <span className="hidden print:inline mx-1">
-                      {nganHang || "____"}
-                    </span>
+                  <div className="info-row">
+                    <span className="info-label">Tài khoản:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={taiKhoan}
+                          onChange={(e) => setTaiKhoan(e.target.value)}
+                          className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
+                          placeholder="____"
+                        />
+                      </span>
+                      <span className="hidden print:inline mx-1">
+                        {taiKhoan || "____"}
+                      </span>
+                      tại Ngân hàng
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={nganHang}
+                          onChange={(e) => setNganHang(e.target.value)}
+                          className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
+                          placeholder="____"
+                        />
+                      </span>
+                      <span className="hidden print:inline mx-1">
+                        {nganHang || "____"}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="">Đại diện:</span>
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={daiDien}
-                        onChange={(e) => setDaiDien(e.target.value)}
-                        className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                        placeholder="Nhập tên đại diện"
-                      />
-                    </span>
-                    <span className="hidden print:inline ml-2">
-                      {daiDien || "______"}
-                    </span>
-                    <span className=" ml-4">Chức vụ:</span>
-                    <span className="print:hidden">
-                      <input
-                        type="text"
-                        value={chucVu}
-                        onChange={(e) => setChucVu(e.target.value)}
-                        className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                        placeholder="Nhập chức vụ"
-                      />
-                    </span>
-                    <span className="hidden print:inline ml-2">
-                      {chucVu || "______"}
-                    </span>
+                  <div className="info-row">
+                    <span className="info-label">Đại diện:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={daiDien}
+                          onChange={(e) => setDaiDien(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập tên đại diện"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {daiDien || "______"}
+                      </span>
+                      <span className=" ml-4 font-bold">Chức vụ:</span>
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={chucVu}
+                          onChange={(e) => setChucVu(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập chức vụ"
+                        />
+                      </span>
+                      <span className="hidden print:inline ml-2">
+                        {chucVu || "______"}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     (Theo Giấy uỷ quyền số
@@ -541,97 +544,106 @@ const GiayThoaThuanTraThay = () => {
                 {tenKH || "______"}
               </span>
             </h2>
-            <div className="text-sm space-y-2">
-              <div>
-                <span className="">Địa chỉ:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={diaChiKH}
-                    onChange={(e) => setDiaChiKH(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-full max-w-md ml-2 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập địa chỉ"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {diaChiKH || "______"}
-                </span>
+            <div className="text-sm space-y-1">
+              <div className="info-row">
+                <span className="info-label">Địa chỉ:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={diaChiKH}
+                      onChange={(e) => setDiaChiKH(e.target.value)}
+                      className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                      placeholder="Nhập địa chỉ"
+                    />
+                  </span>
+                  <span className="hidden print:inline">
+                    {diaChiKH || "______"}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="">Điện thoại:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={dienThoaiKH}
-                    onChange={(e) => setDienThoaiKH(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập số điện thoại"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {dienThoaiKH || "______"}
-                </span>
+              <div className="info-row">
+                <span className="info-label">Điện thoại:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={dienThoaiKH}
+                      onChange={(e) => setDienThoaiKH(e.target.value)}
+                      className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                      placeholder="Nhập số điện thoại"
+                    />
+                  </span>
+                  <span className="hidden print:inline">
+                    {dienThoaiKH || "______"}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="">Mã số thuế:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={maSoThueKH}
-                    onChange={(e) => setMaSoThueKH(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập mã số thuế"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {maSoThueKH || "______"}
-                </span>
+              <div className="info-row">
+                <span className="info-label">Mã số thuế:</span>
+                <div className="info-value">
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={maSoThueKH}
+                      onChange={(e) => setMaSoThueKH(e.target.value)}
+                      className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                      placeholder="Nhập mã số thuế"
+                    />
+                  </span>
+                  <span className="hidden print:inline">
+                    {maSoThueKH || "______"}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="">Căn cước/CCCD/Hộ chiếu: Số</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={soCCCDKH}
-                    onChange={(e) => setSoCCCDKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {soCCCDKH || "____"}
-                </span>
-                cấp ngày
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={formatDate(ngayCapKH)}
-                    onChange={(e) => setNgayCapKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-24 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {formatDate(ngayCapKH) || "____"}
-                </span>
-                bởi
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={noiCapKH}
-                    onChange={(e) => setNoiCapKH(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {noiCapKH || "____"}
-                </span>
+              <div className="info-row">
+                <span className="info-label">CCCD/Hộ chiếu:</span>
+                <div className="info-value">
+                  Số
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={soCCCDKH}
+                      onChange={(e) => setSoCCCDKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
+                      placeholder="____"
+                    />
+                  </span>
+                  <span className="hidden print:inline mx-1">
+                    {soCCCDKH || "____"}
+                  </span>
+                  cấp ngày
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={formatDate(ngayCapKH)}
+                      onChange={(e) => setNgayCapKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 py-0 text-sm w-24 focus:outline-none focus:border-blue-500"
+                      placeholder="____"
+                    />
+                  </span>
+                  <span className="hidden print:inline mx-1">
+                    {formatDate(ngayCapKH) || "____"}
+                  </span>
+                  bởi
+                  <span className="print:hidden">
+                    <input
+                      type="text"
+                      value={noiCapKH}
+                      onChange={(e) => setNoiCapKH(e.target.value)}
+                      className="border-b border-gray-400 px-1 py-0 text-sm w-48 focus:outline-none focus:border-blue-500"
+                      placeholder="____"
+                    />
+                  </span>
+                  <span className="hidden print:inline mx-1">
+                    {noiCapKH || "____"}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Checkbox for spouse */}
-            <div className="print:hidden mb-2">
+            <div className="print:hidden mb-2 mt-2">
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -662,93 +674,102 @@ const GiayThoaThuanTraThay = () => {
                     {tenVoChong || "______"}
                   </span>
                 </h2>
-                <div className="text-sm space-y-2">
-              <div>
-                <span className="">Địa chỉ:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={diaChiVoChong}
-                    onChange={(e) => setDiaChiVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-full max-w-md ml-2 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập địa chỉ"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {diaChiVoChong || "______"}
-                </span>
-              </div>
-              <div>
-                <span className="">Điện thoại:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={dienThoaiVoChong}
-                    onChange={(e) => setDienThoaiVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập số điện thoại"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {dienThoaiVoChong || "______"}
-                </span>
-              </div>
-              <div>
-                <span className="">Mã số thuế:</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={maSoThueVoChong}
-                    onChange={(e) => setMaSoThueVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="Nhập mã số thuế"
-                  />
-                </span>
-                <span className="hidden print:inline ml-2">
-                  {maSoThueVoChong || "______"}
-                </span>
-              </div>
-              <div>
-                <span className="">Căn cước/CCCD/Hộ chiếu: Số</span>
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={soCCCDVoChong}
-                    onChange={(e) => setSoCCCDVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {soCCCDVoChong || "____"}
-                </span>
-                cấp ngày
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={formatDate(ngayCapVoChong)}
-                    onChange={(e) => setNgayCapVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-24 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {formatDate(ngayCapVoChong) || "____"}
-                </span>
-                bởi
-                <span className="print:hidden">
-                  <input
-                    type="text"
-                    value={noiCapVoChong}
-                    onChange={(e) => setNoiCapVoChong(e.target.value)}
-                    className="border-b border-gray-400 px-1 py-0 text-sm w-48 focus:outline-none focus:border-blue-500"
-                    placeholder="____"
-                  />
-                </span>
-                <span className="hidden print:inline mx-1">
-                  {noiCapVoChong || "____"}
-                </span>
-              </div>
+                <div className="text-sm space-y-1">
+                  <div className="info-row">
+                    <span className="info-label">Địa chỉ:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={diaChiVoChong}
+                          onChange={(e) => setDiaChiVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập địa chỉ"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {diaChiVoChong || "______"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Điện thoại:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={dienThoaiVoChong}
+                          onChange={(e) => setDienThoaiVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập số điện thoại"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {dienThoaiVoChong || "______"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Mã số thuế:</span>
+                    <div className="info-value">
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={maSoThueVoChong}
+                          onChange={(e) => setMaSoThueVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-2 py-1 text-sm w-full focus:outline-none focus:border-blue-500"
+                          placeholder="Nhập mã số thuế"
+                        />
+                      </span>
+                      <span className="hidden print:inline">
+                        {maSoThueVoChong || "______"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">CCCD/Hộ chiếu:</span>
+                    <div className="info-value">
+                      Số
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={soCCCDVoChong}
+                          onChange={(e) => setSoCCCDVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-1 py-0 text-sm w-32 focus:outline-none focus:border-blue-500"
+                          placeholder="____"
+                        />
+                      </span>
+                      <span className="hidden print:inline mx-1">
+                        {soCCCDVoChong || "____"}
+                      </span>
+                      cấp ngày
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={formatDate(ngayCapVoChong)}
+                          onChange={(e) => setNgayCapVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-1 py-0 text-sm w-24 focus:outline-none focus:border-blue-500"
+                          placeholder="____"
+                        />
+                      </span>
+                      <span className="hidden print:inline mx-1">
+                        {formatDate(ngayCapVoChong) || "____"}
+                      </span>
+                      bởi
+                      <span className="print:hidden">
+                        <input
+                          type="text"
+                          value={noiCapVoChong}
+                          onChange={(e) => setNoiCapVoChong(e.target.value)}
+                          className="border-b border-gray-400 px-1 py-0 text-sm w-48 focus:outline-none focus:border-blue-500"
+                          placeholder="____"
+                        />
+                      </span>
+                      <span className="hidden print:inline mx-1">
+                        {noiCapVoChong || "____"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -792,65 +813,74 @@ const GiayThoaThuanTraThay = () => {
                 sau:
               </p>
               <div className="ml-4 space-y-1">
-                <p>
-                  - Model:
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={modelXe}
-                      onChange={(e) => setModelXe(e.target.value)}
-                      className="border-b border-gray-400 px-1 py-0 text-sm w-48 ml-2 focus:outline-none focus:border-blue-500"
-                      placeholder="Nhập model xe"
-                    />
-                  </span>
-                  <span className="hidden print:inline ml-2">
-                    {modelXe || "______"}
-                  </span>
-                </p>
-                <p>
-                  - Số Khung:
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={soKhung}
-                      onChange={(e) => setSoKhung(e.target.value)}
-                      className="border-b border-gray-400 px-1 py-0 text-sm w-48 ml-2 focus:outline-none focus:border-blue-500"
-                      placeholder="Nhập số khung"
-                    />
-                  </span>
-                  <span className="hidden print:inline ml-2">
-                    {soKhung || "______"}
-                  </span>
-                </p>
-                <p>
-                  - Số Máy:
-                  <span className="print:hidden">
-                    <input
-                      type="text"
-                      value={soMay}
-                      onChange={(e) => setSoMay(e.target.value)}
-                      className="border-b border-gray-400 px-1 py-0 text-sm w-48 ml-2 focus:outline-none focus:border-blue-500"
-                      placeholder="Nhập số máy"
-                    />
-                  </span>
-                  <span className="hidden print:inline ml-2">
-                    {soMay || "______"}
-                  </span>
-                </p>
-                <p>
-                  - Giá trị xe mua (đã bao gồm ưu đãi/giảm giá):
-                  <span className="print:hidden">
-                    <CurrencyInput
-                      value={giaTriXe}
-                      onChange={(val) => setGiaTriXe(val)}
-                      className="border-b border-gray-400 px-1 py-0 text-sm w-48 ml-2 focus:outline-none focus:border-blue-500"
-                      placeholder="Nhập giá trị"
-                    />
-                  </span>
-                  <span className="hidden print:inline ml-2">
-                    {formatCurrency(giaTriXe) || "______"} VNĐ
-                  </span>
-                </p>
+                <div className="info-row">
+                  <span className="info-label w-[100px] min-w-[100px]">Model:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={modelXe}
+                        onChange={(e) => setModelXe(e.target.value)}
+                        className="border-b border-gray-400 px-1 py-0 text-sm w-full focus:outline-none focus:border-blue-500"
+                        placeholder="Nhập model xe"
+                      />
+                    </span>
+                    <span className="hidden print:inline">
+                      {modelXe || "______"}
+                    </span>
+                  </div>
+                </div>
+                <div className="info-row">
+                  <span className="info-label w-[100px] min-w-[100px]">Số Khung:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={soKhung}
+                        onChange={(e) => setSoKhung(e.target.value)}
+                        className="border-b border-gray-400 px-1 py-0 text-sm w-full focus:outline-none focus:border-blue-500"
+                        placeholder="Nhập số khung"
+                      />
+                    </span>
+                    <span className="hidden print:inline">
+                      {soKhung || "______"}
+                    </span>
+                  </div>
+                </div>
+                <div className="info-row">
+                  <span className="info-label w-[100px] min-w-[100px]">Số Máy:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <input
+                        type="text"
+                        value={soMay}
+                        onChange={(e) => setSoMay(e.target.value)}
+                        className="border-b border-gray-400 px-1 py-0 text-sm w-full focus:outline-none focus:border-blue-500"
+                        placeholder="Nhập số máy"
+                      />
+                    </span>
+                    <span className="hidden print:inline">
+                      {soMay || "______"}
+                    </span>
+                  </div>
+                </div>
+                <div className="info-row">
+                  <span className="info-label w-[100px] min-w-[100px]">Giá trị xe:</span>
+                  <div className="info-value">
+                    <span className="print:hidden">
+                      <CurrencyInput
+                        value={giaTriXe}
+                        onChange={(val) => setGiaTriXe(val)}
+                        className="border-b border-gray-400 px-1 py-0 text-sm w-48 focus:outline-none focus:border-blue-500"
+                        placeholder="Nhập giá trị"
+                      />
+                    </span>
+                    <span className="hidden print:inline">
+                      {formatCurrency(giaTriXe) || "______"} VNĐ
+                    </span>
+                    <span className="ml-1">(đã bao gồm ưu đãi/giảm giá)</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1135,7 +1165,7 @@ const GiayThoaThuanTraThay = () => {
                     tin liên quan đến xe ô tô, khoản vay được VinFast, VinFast
                     Trading cam kết trả thay và các thông tin khác của Khách
                     Hàng tại Ngân Hàng hoặc tại VinFast, VinFast Trading, Bên
-                    bán cho bên còn lại theo yêu cầu của bên còn lại với thời
+                    bán cho bên còn lại theo yêu cầu của bên còn lại with thời
                     gian và số lượng cung cấp không hạn chế. Việc sử dụng thông
                     tin sau khi được Ngân Hàng, VinFast, VinFast Trading, Bên
                     bán cung cấp, thực hiện theo quyết định của Ngân Hàng,
@@ -1345,13 +1375,13 @@ const GiayThoaThuanTraThay = () => {
           </div>
 
           {/* Signature Section */}
-          <div className="mt-12 flex justify-between">
+          <div className="mt-12 flex justify-between signature-block">
             <div className="text-center flex-1">
-              <p className="font-bold mb-1">ĐẠI DIỆN BÊN BÁN</p>
+              <p className="font-bold mb-1 signer-title">ĐẠI DIỆN BÊN BÁN</p>
               <p className="text-sm italic mb-16">(Ký và ghi rõ họ tên)</p>
             </div>
             <div className="text-center flex-1">
-              <p className="font-bold mb-1">KHÁCH HÀNG</p>
+              <p className="font-bold mb-1 signer-title">KHÁCH HÀNG</p>
               <p className="text-sm italic mb-16">(Ký và ghi rõ họ tên)</p>
             </div>
           </div>
@@ -1373,63 +1403,6 @@ const GiayThoaThuanTraThay = () => {
           In Giấy Thỏa Thuận
         </button>
       </div>
-
-      {/* Print Styles */}
-      <style>{`
-        @media print {
-          @page {
-            margin: 0;
-            size: A4 portrait;
-          }
-          
-          body * {
-            visibility: hidden;
-          }
-          
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-          
-          #printable-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            box-shadow: none;
-            page-break-after: avoid;
-            page-break-inside: avoid;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-          
-          /* Padding cho từng trang khi in */
-          @page {
-            margin: 10mm 10mm;
-            padding: 0;
-          }
-          
-          .print\\:hidden {
-            display: none !important;
-          }
-          
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            overflow: hidden !important;
-            font-family: 'Times New Roman', Times, serif !important;
-          }
-          
-          h1, h2 {
-            page-break-after: avoid;
-          }
-          
-          p {
-            page-break-inside: avoid;
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import {
   getBranchByShowroomName,
   getDefaultBranch,
 } from "../../data/branchData";
+import { PrintStyles } from "./PrintStyles";
 
 const PhieuRutCoc = () => {
   const location = useLocation();
@@ -67,7 +68,7 @@ const PhieuRutCoc = () => {
 
       const branchInfo = showroomName ? getBranchByShowroomName(showroomName) : null;
       setBranch(branchInfo);
-      
+
       // Set header from branch
       setHeaderLeft(getHeaderText(branchInfo));
 
@@ -87,10 +88,10 @@ const PhieuRutCoc = () => {
         if (stateData.tvbh) setNguoiDeNghi(stateData.tvbh);
 
         // Auto-fill first row with contract data
-        const soKhung = stateData.soKhung || stateData.chassisNumber || "";
-        const soHopDong = stateData.vso || stateData.contractNumber || "";
+        const soKhung = stateData.soKhung || stateData.chassisNumber || "";     
+        const soHopDong = stateData.vso || stateData.contractNumber || "";      
         const model = stateData.hieuxe || stateData.dongXe || stateData.model || "";
-        
+
         if (soKhung || soHopDong || model) {
           setTableRows(prev => {
             const newRows = [...prev];
@@ -124,7 +125,7 @@ const PhieuRutCoc = () => {
   if (loading) {
     return (
       <div
-        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        className="min-h-screen bg-gray-50 flex items-center justify-center"    
         style={{ fontFamily: "Times New Roman" }}
       >
         <div className="text-center">
@@ -140,6 +141,7 @@ const PhieuRutCoc = () => {
       className="min-h-screen bg-gray-50 p-8"
       style={{ fontFamily: "Times New Roman" }}
     >
+      <PrintStyles />
       <div className="max-w-4xl mx-auto print:max-w-4xl print:mx-auto">
         <div
           className="flex-1 bg-white p-8 print:pt-0 flex flex-col min-h-screen print:min-h-[calc(100vh-40mm)]"
@@ -147,19 +149,19 @@ const PhieuRutCoc = () => {
         >
           {/* Header Table */}
           <div className="mb-6">
-            <table className="w-full border-2 border-black">
+            <table className="w-full border-2 border-black border-table">
               <tbody>
                 <tr>
                   <td
                     className="border-r-2 border-black font-bold text-sm text-center align-middle"
-                    style={{ width: "30%", height: "90px", padding: "8px" }}
+                    style={{ width: "30%", height: "90px", padding: "8px" }}    
                   >
-                    <div 
+                    <div
                       className="print:hidden w-full h-full flex items-center justify-center"
                       contentEditable
                       suppressContentEditableWarning
                       onBlur={(e) => setHeaderLeft(e.target.innerText)}
-                      style={{ 
+                      style={{
                         outline: "none",
                         whiteSpace: "pre-line",
                         lineHeight: "1.3"
@@ -183,7 +185,7 @@ const PhieuRutCoc = () => {
                         <input
                           type="text"
                           value={headerSuffix}
-                          onChange={(e) => setHeaderSuffix(e.target.value)}
+                          onChange={(e) => setHeaderSuffix(e.target.value)}     
                           className="border-b border-gray-400 px-1 w-32 text-center font-bold focus:outline-none focus:border-blue-500"
                         />
                       </span>
@@ -194,29 +196,33 @@ const PhieuRutCoc = () => {
                     className="p-2 align-middle text-sm"
                     style={{ width: "30%" }}
                   >
-                    <div>
-                      <span>Số: </span>
-                      <span className="print:hidden">
-                        <input
-                          type="text"
-                          value={soPhieu}
-                          onChange={(e) => setSoPhieu(e.target.value)}
-                          className="border-b border-gray-400 px-1 w-24 focus:outline-none focus:border-blue-500"
-                        />
-                      </span>
-                      <span className="hidden print:inline">{soPhieu}</span>
+                    <div className="info-row grid-cols-[40px_1fr]">
+                      <span className="info-label w-[40px]">Số: </span>
+                      <div className="info-value">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={soPhieu}
+                            onChange={(e) => setSoPhieu(e.target.value)}
+                            className="border-b border-gray-400 px-1 w-24 focus:outline-none focus:border-blue-500"
+                          />
+                        </span>
+                        <span className="hidden print:inline">{soPhieu}</span>
+                      </div>
                     </div>
-                    <div className="mt-2 italic">
-                      <span>Ngày đề nghị: </span>
-                      <span className="print:hidden">
-                        <input
-                          type="text"
-                          value={ngayDeNghi}
-                          onChange={(e) => setNgayDeNghi(e.target.value)}
-                          className="border-b border-gray-400 px-1 w-28 focus:outline-none focus:border-blue-500"
-                        />
-                      </span>
-                      <span className="hidden print:inline">{ngayDeNghi}</span>
+                    <div className="mt-2 info-row grid-cols-[100px_1fr]">
+                      <span className="info-label w-[100px] italic">Ngày đề nghị: </span>
+                      <div className="info-value italic">
+                        <span className="print:hidden">
+                          <input
+                            type="text"
+                            value={ngayDeNghi}
+                            onChange={(e) => setNgayDeNghi(e.target.value)}       
+                            className="border-b border-gray-400 px-1 w-28 focus:outline-none focus:border-blue-500"
+                          />
+                        </span>
+                        <span className="hidden print:inline">{ngayDeNghi}</span>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -227,7 +233,7 @@ const PhieuRutCoc = () => {
           {/* Kính gửi */}
           <div className="text-sm space-y-3 mb-4">
             <p className="italic">
-              <strong>Kính gửi:</strong> - <strong>Ban Giám đốc;</strong>
+              <strong>Kính gửi:</strong> - <strong>Ban Giám đốc;</strong>       
             </p>
             <p className="ml-16 italic">
               - <strong>Phòng Tài chính - Kế toán.</strong>
@@ -235,10 +241,10 @@ const PhieuRutCoc = () => {
           </div>
 
           {/* Thông tin người đề nghị */}
-          <div className="text-sm space-y-2 mb-4">
-            <p>
-              Họ và tên người đề nghị:{" "}
-              <strong>
+          <div className="text-sm space-y-1 mb-4">
+            <div className="info-row grid-cols-[180px_1fr]">
+              <span className="info-label w-[180px]">Họ và tên người đề nghị:</span>
+              <div className="info-value font-bold">
                 <span className="print:hidden">
                   <input
                     type="text"
@@ -247,50 +253,56 @@ const PhieuRutCoc = () => {
                     className="border-b border-gray-400 px-2 py-1 text-sm w-64 focus:outline-none focus:border-blue-500"
                   />
                 </span>
-                <span className="hidden print:inline">{nguoiDeNghi}</span>
-              </strong>
-            </p>
-            <p>
-              Bộ phận:{" "}
-              <span className="print:hidden">
-                <input
-                  type="text"
-                  value={boPhan}
-                  onChange={(e) => setBoPhan(e.target.value)}
-                  className="border-b border-gray-400 px-2 py-1 text-sm w-32 focus:outline-none focus:border-blue-500"
-                />
-              </span>
-              <span className="hidden print:inline">{boPhan}</span>
-            </p>
-            <p>
-              Phòng Kinh doanh đề xuất rút{" "}
-              <span className="print:hidden">
-                <input
-                  type="text"
-                  value={phieuCLXX}
-                  onChange={(e) => setPhieuCLXX(e.target.value)}
-                  className="border-b border-gray-400 px-2 py-1 text-sm w-32 focus:outline-none focus:border-blue-500"
-                />
-              </span>
-              <span className="hidden print:inline">{phieuCLXX}</span> như sau:
-            </p>
-            <p>
-              Thời gian dự kiến giao xe:{" "}
-              <span className="print:hidden">
-                <input
-                  type="text"
-                  value={thoiGianGiaoXe}
-                  onChange={(e) => setThoiGianGiaoXe(e.target.value)}
-                  className="border-b border-gray-400 px-2 py-1 text-sm w-64 focus:outline-none focus:border-blue-500"
-                />
-              </span>
-              <span className="hidden print:inline">{thoiGianGiaoXe}</span>
-            </p>
+                <span className="hidden print:inline">{nguoiDeNghi}</span>      
+              </div>
+            </div>
+            <div className="info-row grid-cols-[180px_1fr]">
+              <span className="info-label w-[180px]">Bộ phận:</span>
+              <div className="info-value">
+                <span className="print:hidden">
+                  <input
+                    type="text"
+                    value={boPhan}
+                    onChange={(e) => setBoPhan(e.target.value)}
+                    className="border-b border-gray-400 px-2 py-1 text-sm w-32 focus:outline-none focus:border-blue-500"
+                  />
+                </span>
+                <span className="hidden print:inline">{boPhan}</span>
+              </div>
+            </div>
+            <div className="info-row grid-cols-[180px_1fr]">
+              <span className="info-label w-[180px]">Đề xuất rút:</span>
+              <div className="info-value">
+                <span className="print:hidden">
+                  <input
+                    type="text"
+                    value={phieuCLXX}
+                    onChange={(e) => setPhieuCLXX(e.target.value)}
+                    className="border-b border-gray-400 px-2 py-1 text-sm w-32 focus:outline-none focus:border-blue-500"
+                  />
+                </span>
+                <span className="hidden print:inline">{phieuCLXX}</span>
+              </div>
+            </div>
+            <div className="info-row grid-cols-[180px_1fr]">
+              <span className="info-label w-[180px]">Dự kiến giao xe:</span>
+              <div className="info-value">
+                <span className="print:hidden">
+                  <input
+                    type="text"
+                    value={thoiGianGiaoXe}
+                    onChange={(e) => setThoiGianGiaoXe(e.target.value)}
+                    className="border-b border-gray-400 px-2 py-1 text-sm w-64 focus:outline-none focus:border-blue-500"
+                  />
+                </span>
+                <span className="hidden print:inline">{thoiGianGiaoXe}</span>     
+              </div>
+            </div>
           </div>
 
           {/* Table */}
           <div className="mb-6">
-            <table className="w-full border-2 border-black text-sm">
+            <table className="w-full border-2 border-black text-sm border-table">
               <thead>
                 <tr className="border-b-2 border-black">
                   <th className="border-r border-black p-2 font-bold text-center w-12">
@@ -315,18 +327,18 @@ const PhieuRutCoc = () => {
                         : ""
                     }
                   >
-                    <td className="border-r border-black p-2 text-center">
+                    <td className="border-r border-black p-2 text-center">      
                       <span className="print:hidden">
                         <input
                           type="text"
                           value={row.stt}
                           onChange={(e) =>
-                            handleRowChange(index, "stt", e.target.value)
+                            handleRowChange(index, "stt", e.target.value)       
                           }
                           className="border-b border-gray-400 px-1 w-full text-center focus:outline-none focus:border-blue-500"
                         />
                       </span>
-                      <span className="hidden print:inline">{row.stt}</span>
+                      <span className="hidden print:inline">{row.stt}</span>    
                     </td>
                     <td className="border-r border-black p-2 text-center font-bold text-red-600">
                       <span className="print:hidden">
@@ -334,7 +346,7 @@ const PhieuRutCoc = () => {
                           type="text"
                           value={row.soKhung}
                           onChange={(e) =>
-                            handleRowChange(index, "soKhung", e.target.value)
+                            handleRowChange(index, "soKhung", e.target.value)   
                           }
                           className="border-b border-gray-400 px-1 w-full text-center focus:outline-none focus:border-blue-500 font-bold text-red-600"
                         />
@@ -347,7 +359,7 @@ const PhieuRutCoc = () => {
                           type="text"
                           value={row.soHopDong}
                           onChange={(e) =>
-                            handleRowChange(index, "soHopDong", e.target.value)
+                            handleRowChange(index, "soHopDong", e.target.value) 
                           }
                           className="border-b border-gray-400 px-1 w-full text-center focus:outline-none focus:border-blue-500 font-bold text-red-600"
                         />
@@ -356,18 +368,18 @@ const PhieuRutCoc = () => {
                         {row.soHopDong}
                       </span>
                     </td>
-                    <td className="p-2 text-center font-bold text-red-600">
+                    <td className="p-2 text-center font-bold text-red-600">     
                       <span className="print:hidden">
                         <input
                           type="text"
                           value={row.model}
                           onChange={(e) =>
-                            handleRowChange(index, "model", e.target.value)
+                            handleRowChange(index, "model", e.target.value)     
                           }
                           className="border-b border-gray-400 px-1 w-full text-center focus:outline-none focus:border-blue-500 font-bold text-red-600"
                         />
                       </span>
-                      <span className="hidden print:inline">{row.model}</span>
+                      <span className="hidden print:inline">{row.model}</span>  
                     </td>
                   </tr>
                 ))}
@@ -376,21 +388,21 @@ const PhieuRutCoc = () => {
           </div>
 
           {/* Signature Section */}
-          <div className="mt-8 mb-4">
+          <div className="mt-8 mb-4 signature-block">
             <table className="w-full text-sm">
               <tbody>
                 <tr>
                   <td className="text-center font-bold p-4 w-1/4">
-                    <p className="mb-20">Người đề nghị</p>
+                    <p className="mb-20 signer-title">Người đề nghị</p>
                   </td>
                   <td className="text-center font-bold p-4 w-1/4">
-                    <p className="mb-20">TP. Kế toán</p>
+                    <p className="mb-20 signer-title">TP. Kế toán</p>
                   </td>
                   <td className="text-center font-bold p-4 w-1/4">
-                    <p className="mb-20">TP. Kinh doanh</p>
+                    <p className="mb-20 signer-title">TP. Kinh doanh</p>
                   </td>
                   <td className="text-center font-bold p-4 w-1/4">
-                    <p className="mb-20">Tổng Giám Đốc</p>
+                    <p className="mb-20 signer-title">Tổng Giám Đốc</p>
                   </td>
                 </tr>
               </tbody>
@@ -414,60 +426,6 @@ const PhieuRutCoc = () => {
           In Phiếu
         </button>
       </div>
-
-      <style>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 8mm;
-          }
-
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          #printable-content,
-          #printable-content * {
-            visibility: visible;
-          }
-
-          .min-h-screen {
-            min-height: 0 !important;
-            height: auto !important;
-          }
-
-          #printable-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 194mm !important;
-            min-height: 0 !important;
-            height: auto !important;
-            max-height: 281mm !important;
-            overflow: hidden !important;
-            padding: 5mm !important;
-            margin: 0 !important;
-            background: white !important;
-            font-family: 'Times New Roman', Times, serif !important;
-            font-size: 11pt !important;
-            line-height: 1.3 !important;
-            box-sizing: border-box !important;
-          }
-
-          .print\\:hidden {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };
