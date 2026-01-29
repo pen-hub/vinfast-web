@@ -19,6 +19,32 @@ const sheetsId = defineString("SHEETS_ID", {
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
 /**
+ * Retry helper with exponential backoff for API calls
+ * @param {Function} fn - Async function to retry
+ * @param {number} maxRetries - Maximum number of retry attempts
+ * @return {Promise} Result of the function call
+ */
+async function retryWithBackoff(fn, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isRateLimitError = error.code === 429 ||
+        error.message?.includes("rate limit") ||
+        error.message?.includes("quota");
+
+      if (isRateLimitError && i < maxRetries - 1) {
+        const delayMs = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+        console.log(`Rate limit hit, retrying in ${delayMs}ms (attempt ${i + 1}/${maxRetries})...`);
+        await new Promise((r) => setTimeout(r, delayMs));
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
+/**
  * Get authenticated Google Sheets client
  * @return {Object} Google Sheets API client
  */
@@ -101,13 +127,15 @@ exports.onContractExported = onValueCreated(
       const sheets = await getGoogleSheetsClient();
       const row = formatContractRow(contract, contractId);
 
-      await sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: "HopDongDaXuat!A:X",
-        valueInputOption: "USER_ENTERED",
-        requestBody: {
-          values: [row],
-        },
+      await retryWithBackoff(async () => {
+        return await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: "HopDongDaXuat!A:X",
+          valueInputOption: "USER_ENTERED",
+          requestBody: {
+            values: [row],
+          },
+        });
       });
 
       console.log(`Contract ${contractId} synced to Google Sheets`);
@@ -150,9 +178,11 @@ exports.onContractUpdated = onValueUpdated(
       const sheets = await getGoogleSheetsClient();
 
       // Find and update the row in Google Sheets
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range: "HopDongDaXuat!W:W", // Column W contains contractId
+      const response = await retryWithBackoff(async () => {
+        return await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetId,
+          range: "HopDongDaXuat!W:W", // Column W contains contractId
+        });
       });
 
       const rows = response.data.values || [];
@@ -167,13 +197,15 @@ exports.onContractUpdated = onValueUpdated(
 
       if (rowIndex > 0) {
         const row = formatContractRow(contract, contractId);
-        await sheets.spreadsheets.values.update({
-          spreadsheetId: sheetId,
-          range: `HopDongDaXuat!A${rowIndex}:X${rowIndex}`,
-          valueInputOption: "USER_ENTERED",
-          requestBody: {
-            values: [row],
-          },
+        await retryWithBackoff(async () => {
+          return await sheets.spreadsheets.values.update({
+            spreadsheetId: sheetId,
+            range: `HopDongDaXuat!A${rowIndex}:X${rowIndex}`,
+            valueInputOption: "USER_ENTERED",
+            requestBody: {
+              values: [row],
+            },
+          });
         });
         console.log(`Contract ${contractId} updated in Google Sheets`);
       }
@@ -202,10 +234,24 @@ exports.dailySummary = onSchedule(
     try {
       const db = getDatabase();
 
-      // Get today's exported contracts
+      // Get today's date
       const today = new Date();
       const todayStr = today.toISOString().split("T")[0];
 
+      // Check if summary already exists (idempotency check)
+      const summaryRef = db.ref(`/dailySummaries/${todayStr}`);
+      const existingSnapshot = await summaryRef.once("value");
+
+      if (existingSnapshot.exists()) {
+        console.log(`Summary ${todayStr} already exists, skipping generation`);
+        return {
+          success: true,
+          skipped: true,
+          message: "Summary already exists",
+        };
+      }
+
+      // Get today's exported contracts
       const snapshot = await db.ref("/exportedContracts").once("value");
       const contracts = snapshot.val() || {};
 
@@ -228,7 +274,7 @@ exports.dailySummary = onSchedule(
       );
 
       // Save summary to database
-      await db.ref(`/dailySummaries/${todayStr}`).set({
+      await summaryRef.set({
         date: todayStr,
         contractCount: todayCount,
         totalValue: totalValue,
@@ -300,13 +346,15 @@ exports.syncToSheets = onRequest(
       const sheets = await getGoogleSheetsClient();
       const row = formatContractRow(contract, contractId);
 
-      await sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: "HopDongDaXuat!A:X",
-        valueInputOption: "USER_ENTERED",
-        requestBody: {
-          values: [row],
-        },
+      await retryWithBackoff(async () => {
+        return await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: "HopDongDaXuat!A:X",
+          valueInputOption: "USER_ENTERED",
+          requestBody: {
+            values: [row],
+          },
+        });
       });
 
       res.json({success: true, message: "Contract synced to Google Sheets"});
