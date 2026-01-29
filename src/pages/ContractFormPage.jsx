@@ -11,6 +11,7 @@ import CurrencyInput from '../components/shared/CurrencyInput';
 import { generateVSO } from '../utils/vsoGenerator';
 import { isValidCCCD, isValidPhone, validateRequiredFields } from '../utils/validation';
 import { sanitizeContractData } from '../utils/sanitize';
+import { validateContract, normalizeContract } from '../utils/contract-data-validation-normalizer';
 
 export default function ContractFormPage() {
   const navigate = useNavigate();
@@ -654,8 +655,28 @@ export default function ContractFormPage() {
       return;
     }
 
+    // Validate contract data using validation utility
+    const contractValidation = validateContract(contract);
+    if (!contractValidation.isValid) {
+      toast.error(`Dữ liệu không hợp lệ: ${contractValidation.errors.join(', ')}`);
+      return;
+    }
+
+    // Normalize contract data before saving
+    const normalizedContract = normalizeContract(contract);
+
     try {
       const safeValue = (val) => val !== undefined && val !== null ? val : "";
+
+      // Helper to parse currency value
+      const parseCurrency = (val) => {
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string') {
+          const num = parseInt(val.replace(/[^\d]/g, ''), 10);
+          return isNaN(num) ? 0 : num;
+        }
+        return 0;
+      };
 
       // Auto-calculate tiền đối ứng = Giá hợp đồng - Số tiền vay
       const parseValue = (val) => {
@@ -666,15 +687,15 @@ export default function ContractFormPage() {
         return typeof val === "number" ? val : 0;
       };
 
-      const contractPriceNum = parseValue(contract.contractPrice);
-      const loanAmountNum = parseValue(contract.loanAmount);
-      let calculatedTienDoiUng = contract.tienDoiUng;
+      const contractPriceNum = parseValue(normalizedContract.contractPrice);
+      const loanAmountNum = parseValue(normalizedContract.loanAmount);
+      let calculatedTienDoiUng = normalizedContract.tienDoiUng;
 
       // Nếu có giá hợp đồng và số tiền vay, tự động tính tiền đối ứng
       if (contractPriceNum > 0 && loanAmountNum > 0) {
         const tienDoiUngNum = contractPriceNum - loanAmountNum;
         calculatedTienDoiUng = tienDoiUngNum > 0 ? tienDoiUngNum.toString() : "0";
-      } else if (contractPriceNum > 0 && (contract.payment === "trả thẳng" || contract.payment === "tra thang")) {
+      } else if (contractPriceNum > 0 && (normalizedContract.payment === "trả thẳng" || normalizedContract.payment === "tra thang")) {
         // Nếu trả thẳng (không vay), tiền đối ứng = giá hợp đồng
         calculatedTienDoiUng = contractPriceNum.toString();
       }
@@ -682,48 +703,48 @@ export default function ContractFormPage() {
       if (isEditMode && contractData.firebaseKey) {
         // Get old status to check if we need to sync with exportedContracts
         const oldStatus = contractData.status || contractData.trangThai || "";
-        const newStatus = safeValue(contract.status) || "mới";
+        const newStatus = safeValue(normalizedContract.status) || "mới";
         const oldStatusLower = oldStatus.toLowerCase();
         const newStatusLower = newStatus.toLowerCase();
 
         // Update existing contract
         const contractRef = ref(database, `contracts/${contractData.firebaseKey}`);
         const updateData = {
-          id: contract.id || "",
-          createdDate: contract.createdAt || contract.createdDate || "",
-          tvbh: safeValue(contract.tvbh),
-          showroom: safeValue(contract.showroom),
-          vso: safeValue(contract.vso),
-          customerName: safeValue(contract.customerName),
-          phone: safeValue(contract.phone),
-          email: safeValue(contract.email),
-          address: safeValue(contract.address),
-          cccd: safeValue(contract.cccd),
-          ngayCap: safeValue(contract.issueDate),
-          noiCap: safeValue(contract.issuePlace),
-          dongXe: safeValue(contract.model),
-          phienBan: safeValue(contract.variant),
-          ngoaiThat: safeValue(contract.exterior),
-          noiThat: safeValue(contract.interior),
-          giaHD: safeValue(contract.contractPrice),
-          soTienCoc: safeValue(contract.deposit),
-          tienDoiUng: safeValue(calculatedTienDoiUng),
-          "Tiền đối ứng": safeValue(calculatedTienDoiUng),
-          thanhToan: safeValue(contract.payment),
-          soTienVay: safeValue(contract.loanAmount),
-          nganHang: safeValue(contract.bank),
-          uuDai: Array.isArray(contract.uuDai) ? contract.uuDai : [],
-          quaTang: safeValue(contract.quaTang),
-          quaTangKhac: safeValue(contract.quaTangKhac),
-          soTienPhaiThu: safeValue(contract.soTienPhaiThu),
+          id: normalizedContract.id || "",
+          createdDate: normalizedContract.createdAt || normalizedContract.createdDate || "",
+          tvbh: safeValue(normalizedContract.tvbh),
+          showroom: safeValue(normalizedContract.showroom),
+          vso: safeValue(normalizedContract.vso),
+          customerName: safeValue(normalizedContract.customerName),
+          phone: safeValue(normalizedContract.phone),
+          email: safeValue(normalizedContract.email),
+          address: safeValue(normalizedContract.address),
+          cccd: safeValue(normalizedContract.cccd),
+          ngayCap: safeValue(normalizedContract.issueDate),
+          noiCap: safeValue(normalizedContract.issuePlace),
+          dongXe: safeValue(normalizedContract.model),
+          phienBan: safeValue(normalizedContract.variant),
+          ngoaiThat: safeValue(normalizedContract.exterior),
+          noiThat: safeValue(normalizedContract.interior),
+          giaHD: normalizedContract.contractPrice,
+          soTienCoc: normalizedContract.deposit,
+          tienDoiUng: parseCurrency(calculatedTienDoiUng),
+          "Tiền đối ứng": parseCurrency(calculatedTienDoiUng),
+          thanhToan: normalizedContract.payment,
+          soTienVay: normalizedContract.loanAmount,
+          nganHang: safeValue(normalizedContract.bank),
+          uuDai: Array.isArray(normalizedContract.uuDai) ? normalizedContract.uuDai : [],
+          quaTang: safeValue(normalizedContract.quaTang),
+          quaTangKhac: safeValue(normalizedContract.quaTangKhac),
+          soTienPhaiThu: normalizedContract.soTienPhaiThu,
           trangThai: newStatus,
           // Company fields
-          khachHangLa: safeValue(contract.khachHangLa),
-          msdn: safeValue(contract.msdn),
-          daiDien: safeValue(contract.daiDien),
-          chucVu: safeValue(contract.chucVu),
-          giayUyQuyen: safeValue(contract.giayUyQuyen),
-          giayUyQuyenNgay: safeValue(contract.giayUyQuyenNgay),
+          khachHangLa: safeValue(normalizedContract.khachHangLa),
+          msdn: safeValue(normalizedContract.msdn),
+          daiDien: safeValue(normalizedContract.daiDien),
+          chucVu: safeValue(normalizedContract.chucVu),
+          giayUyQuyen: safeValue(normalizedContract.giayUyQuyen),
+          giayUyQuyenNgay: safeValue(normalizedContract.giayUyQuyenNgay),
         };
 
         console.log("Update data being sent to Firebase:", updateData);
@@ -745,50 +766,50 @@ export default function ContractFormPage() {
 
           // Map contract data to exported format (matching HopDongDaXuat format)
           const exportedData = {
-            id: safeValue(contract.id),
+            id: safeValue(normalizedContract.id),
             stt: safeValue(contractData.stt),
             "ngày xhd": ngayXhd, // Export date - now
-            tvbh: safeValue(contract.tvbh),
-            showroom: safeValue(contract.showroom),
-            VSO: safeValue(contract.vso),
-            "Tên Kh": safeValue(contract.customerName),
-            "Số Điện Thoại": safeValue(contract.phone),
-            Email: safeValue(contract.email || ""),
-            "Địa Chỉ": safeValue(contract.address || ""),
-            CCCD: safeValue(contract.cccd),
-            "Ngày Cấp": safeValue(contract.issueDate),
-            "Nơi Cấp": safeValue(contract.issuePlace),
-            "Dòng xe": safeValue(contract.model),
-            "Phiên Bản": safeValue(contract.variant),
-            "Ngoại Thất": safeValue(contract.exterior),
-            "Nội Thất": safeValue(contract.interior),
-            "Giá Niêm Yết": safeValue(contract.contractPrice),
-            "Giá Giảm": safeValue(contract.giamGia || ""),
-            "Giá Hợp Đồng": safeValue(contract.contractPrice),
-            "Tiền đặt cọc": safeValue(contract.deposit),
-            tienDatCoc: safeValue(contract.deposit),
-            "Tiền đối ứng": safeValue(calculatedTienDoiUng),
-            tienDoiUng: safeValue(calculatedTienDoiUng),
+            tvbh: safeValue(normalizedContract.tvbh),
+            showroom: safeValue(normalizedContract.showroom),
+            VSO: safeValue(normalizedContract.vso),
+            "Tên Kh": safeValue(normalizedContract.customerName),
+            "Số Điện Thoại": safeValue(normalizedContract.phone),
+            Email: safeValue(normalizedContract.email || ""),
+            "Địa Chỉ": safeValue(normalizedContract.address || ""),
+            CCCD: safeValue(normalizedContract.cccd),
+            "Ngày Cấp": safeValue(normalizedContract.issueDate),
+            "Nơi Cấp": safeValue(normalizedContract.issuePlace),
+            "Dòng xe": safeValue(normalizedContract.model),
+            "Phiên Bản": safeValue(normalizedContract.variant),
+            "Ngoại Thất": safeValue(normalizedContract.exterior),
+            "Nội Thất": safeValue(normalizedContract.interior),
+            "Giá Niêm Yết": normalizedContract.contractPrice,
+            "Giá Giảm": normalizedContract.giamGia || 0,
+            "Giá Hợp Đồng": normalizedContract.contractPrice,
+            "Tiền đặt cọc": normalizedContract.deposit,
+            tienDatCoc: normalizedContract.deposit,
+            "Tiền đối ứng": parseCurrency(calculatedTienDoiUng),
+            tienDoiUng: parseCurrency(calculatedTienDoiUng),
             "Số Khung": safeValue(contractData.soKhung || contractData.chassisNumber || contractData["Số Khung"] || ""),
             "Số Máy": safeValue(contractData.soMay || contractData.engineNumber || contractData["Số Máy"] || ""),
             "Tình Trạng": safeValue(contractData.tinhTrangXe || contractData.vehicleStatus || contractData["Tình Trạng Xe"] || ""),
-            "ngân hàng": safeValue(contract.bank || ""),
-            thanhToan: safeValue(contract.payment || ""),
-            soTienVay: safeValue(contract.loanAmount || ""),
+            "ngân hàng": safeValue(normalizedContract.bank || ""),
+            thanhToan: normalizedContract.payment,
+            soTienVay: normalizedContract.loanAmount,
             "ưu đãi": (() => {
-              const uuDaiValue = contract.uuDai || "";
+              const uuDaiValue = normalizedContract.uuDai || "";
               if (Array.isArray(uuDaiValue)) {
                 return uuDaiValue.length > 0 ? uuDaiValue.join(", ") : "";
               }
               return safeValue(uuDaiValue);
             })(),
-            "Quà tặng": safeValue(contract.quaTang),
-            "Quà tặng khác": safeValue(contract.quaTangKhac),
-            "Số tiền vay": safeValue(contract.soTienVay),
-            "Số tiền phải thu": safeValue(contract.soTienPhaiThu),
-            quaTang: safeValue(contract.quaTang),
-            quaTangKhac: safeValue(contract.quaTangKhac),
-            soTienPhaiThu: safeValue(contract.soTienPhaiThu),
+            "Quà tặng": safeValue(normalizedContract.quaTang),
+            "Quà tặng khác": safeValue(normalizedContract.quaTangKhac),
+            "Số tiền vay": normalizedContract.soTienVay || normalizedContract.loanAmount,
+            "Số tiền phải thu": normalizedContract.soTienPhaiThu,
+            quaTang: safeValue(normalizedContract.quaTang),
+            quaTangKhac: safeValue(normalizedContract.quaTangKhac),
+            soTienPhaiThu: normalizedContract.soTienPhaiThu,
           };
 
           // Sanitize data before Firebase write
@@ -807,40 +828,40 @@ export default function ContractFormPage() {
         const contractsRef = ref(database, "contracts");
         const newContractData = {
           id: id || "",
-          createdDate: contract.createdAt || "",
-          tvbh: safeValue(contract.tvbh),
-          showroom: safeValue(contract.showroom),
-          vso: safeValue(contract.vso),
-          customerName: safeValue(contract.customerName),
-          phone: safeValue(contract.phone),
-          email: safeValue(contract.email),
-          address: safeValue(contract.address),
-          cccd: safeValue(contract.cccd),
-          ngayCap: safeValue(contract.issueDate),
-          noiCap: safeValue(contract.issuePlace),
-          dongXe: safeValue(contract.model),
-          phienBan: safeValue(contract.variant),
-          ngoaiThat: safeValue(contract.exterior),
-          noiThat: safeValue(contract.interior),
-          giaHD: safeValue(contract.contractPrice),
-          soTienCoc: safeValue(contract.deposit),
-          tienDoiUng: safeValue(calculatedTienDoiUng),
-          "Tiền đối ứng": safeValue(calculatedTienDoiUng),
-          thanhToan: safeValue(contract.payment),
-          soTienVay: safeValue(contract.loanAmount),
-          nganHang: safeValue(contract.bank),
-          uuDai: Array.isArray(contract.uuDai) ? contract.uuDai : [],
-          quaTang: safeValue(contract.quaTang),
-          quaTangKhac: safeValue(contract.quaTangKhac),
-          soTienPhaiThu: safeValue(contract.soTienPhaiThu),
-          trangThai: safeValue(contract.status) || "mới",
+          createdDate: normalizedContract.createdAt || "",
+          tvbh: safeValue(normalizedContract.tvbh),
+          showroom: safeValue(normalizedContract.showroom),
+          vso: safeValue(normalizedContract.vso),
+          customerName: safeValue(normalizedContract.customerName),
+          phone: safeValue(normalizedContract.phone),
+          email: safeValue(normalizedContract.email),
+          address: safeValue(normalizedContract.address),
+          cccd: safeValue(normalizedContract.cccd),
+          ngayCap: safeValue(normalizedContract.issueDate),
+          noiCap: safeValue(normalizedContract.issuePlace),
+          dongXe: safeValue(normalizedContract.model),
+          phienBan: safeValue(normalizedContract.variant),
+          ngoaiThat: safeValue(normalizedContract.exterior),
+          noiThat: safeValue(normalizedContract.interior),
+          giaHD: normalizedContract.contractPrice,
+          soTienCoc: normalizedContract.deposit,
+          tienDoiUng: parseCurrency(calculatedTienDoiUng),
+          "Tiền đối ứng": parseCurrency(calculatedTienDoiUng),
+          thanhToan: normalizedContract.payment,
+          soTienVay: normalizedContract.loanAmount,
+          nganHang: safeValue(normalizedContract.bank),
+          uuDai: Array.isArray(normalizedContract.uuDai) ? normalizedContract.uuDai : [],
+          quaTang: safeValue(normalizedContract.quaTang),
+          quaTangKhac: safeValue(normalizedContract.quaTangKhac),
+          soTienPhaiThu: normalizedContract.soTienPhaiThu,
+          trangThai: normalizedContract.status || "mới",
           // Company fields
-          khachHangLa: safeValue(contract.khachHangLa),
-          msdn: safeValue(contract.msdn),
-          daiDien: safeValue(contract.daiDien),
-          chucVu: safeValue(contract.chucVu),
-          giayUyQuyen: safeValue(contract.giayUyQuyen),
-          giayUyQuyenNgay: safeValue(contract.giayUyQuyenNgay),
+          khachHangLa: safeValue(normalizedContract.khachHangLa),
+          msdn: safeValue(normalizedContract.msdn),
+          daiDien: safeValue(normalizedContract.daiDien),
+          chucVu: safeValue(normalizedContract.chucVu),
+          giayUyQuyen: safeValue(normalizedContract.giayUyQuyen),
+          giayUyQuyenNgay: safeValue(normalizedContract.giayUyQuyenNgay),
         };
 
         console.log("New contract data being sent to Firebase:", newContractData);
@@ -851,7 +872,7 @@ export default function ContractFormPage() {
         const newRef = await push(contractsRef, sanitizedNewContractData);
 
         // If new contract status is "xuất", also add to exportedContracts
-        const newStatus = safeValue(contract.status) || "mới";
+        const newStatus = normalizedContract.status || "mới";
         if (newStatus.toLowerCase() === "xuất") {
           const exportKey = newRef.key;
           if (exportKey) {
@@ -864,47 +885,47 @@ export default function ContractFormPage() {
               id: id || "",
               stt: "",
               "ngày xhd": ngayXhd,
-              tvbh: safeValue(contract.tvbh),
-              showroom: safeValue(contract.showroom),
-              VSO: safeValue(contract.vso),
-              "Tên Kh": safeValue(contract.customerName),
-              "Số Điện Thoại": safeValue(contract.phone),
-              Email: safeValue(contract.email || ""),
-              "Địa Chỉ": safeValue(contract.address || ""),
-              CCCD: safeValue(contract.cccd),
-              "Ngày Cấp": safeValue(contract.issueDate),
-              "Nơi Cấp": safeValue(contract.issuePlace),
-              "Dòng xe": safeValue(contract.model),
-              "Phiên Bản": safeValue(contract.variant),
-              "Ngoại Thất": safeValue(contract.exterior),
-              "Nội Thất": safeValue(contract.interior),
-              "Giá Niêm Yết": safeValue(contract.contractPrice),
-              "Giá Giảm": safeValue(contract.giamGia || ""),
-              "Giá Hợp Đồng": safeValue(contract.contractPrice),
-              "Tiền đặt cọc": safeValue(contract.deposit),
-              tienDatCoc: safeValue(contract.deposit),
-              "Tiền đối ứng": safeValue(calculatedTienDoiUng),
-              tienDoiUng: safeValue(calculatedTienDoiUng),
+              tvbh: safeValue(normalizedContract.tvbh),
+              showroom: safeValue(normalizedContract.showroom),
+              VSO: safeValue(normalizedContract.vso),
+              "Tên Kh": safeValue(normalizedContract.customerName),
+              "Số Điện Thoại": safeValue(normalizedContract.phone),
+              Email: safeValue(normalizedContract.email || ""),
+              "Địa Chỉ": safeValue(normalizedContract.address || ""),
+              CCCD: safeValue(normalizedContract.cccd),
+              "Ngày Cấp": safeValue(normalizedContract.issueDate),
+              "Nơi Cấp": safeValue(normalizedContract.issuePlace),
+              "Dòng xe": safeValue(normalizedContract.model),
+              "Phiên Bản": safeValue(normalizedContract.variant),
+              "Ngoại Thất": safeValue(normalizedContract.exterior),
+              "Nội Thất": safeValue(normalizedContract.interior),
+              "Giá Niêm Yết": normalizedContract.contractPrice,
+              "Giá Giảm": normalizedContract.giamGia || 0,
+              "Giá Hợp Đồng": normalizedContract.contractPrice,
+              "Tiền đặt cọc": normalizedContract.deposit,
+              tienDatCoc: normalizedContract.deposit,
+              "Tiền đối ứng": parseCurrency(calculatedTienDoiUng),
+              tienDoiUng: parseCurrency(calculatedTienDoiUng),
               "Số Khung": "",
               "Số Máy": "",
               "Tình Trạng": "",
-              "ngân hàng": safeValue(contract.bank || ""),
-              thanhToan: safeValue(contract.payment || ""),
-              soTienVay: safeValue(contract.loanAmount || ""),
+              "ngân hàng": safeValue(normalizedContract.bank || ""),
+              thanhToan: normalizedContract.payment,
+              soTienVay: normalizedContract.loanAmount,
               "ưu đãi": (() => {
-                const uuDaiValue = contract.uuDai || "";
+                const uuDaiValue = normalizedContract.uuDai || "";
                 if (Array.isArray(uuDaiValue)) {
                   return uuDaiValue.length > 0 ? uuDaiValue.join(", ") : "";
                 }
                 return safeValue(uuDaiValue);
               })(),
-              "Quà tặng": safeValue(contract.quaTang),
-              "Quà tặng khác": safeValue(contract.quaTangKhac),
-              "Số tiền vay": safeValue(contract.soTienVay),
-              "Số tiền phải thu": safeValue(contract.soTienPhaiThu),
-              quaTang: safeValue(contract.quaTang),
-              quaTangKhac: safeValue(contract.quaTangKhac),
-              soTienPhaiThu: safeValue(contract.soTienPhaiThu),
+              "Quà tặng": safeValue(normalizedContract.quaTang),
+              "Quà tặng khác": safeValue(normalizedContract.quaTangKhac),
+              "Số tiền vay": normalizedContract.soTienVay || normalizedContract.loanAmount,
+              "Số tiền phải thu": normalizedContract.soTienPhaiThu,
+              quaTang: safeValue(normalizedContract.quaTang),
+              quaTangKhac: safeValue(normalizedContract.quaTangKhac),
+              soTienPhaiThu: normalizedContract.soTienPhaiThu,
             };
 
             const exportedContractRef = ref(database, `exportedContracts/${exportKey}`);

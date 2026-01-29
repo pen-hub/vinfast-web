@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Plus, Edit2, Trash2, Car, BarChart3, Package, TrendingUp, Search, Filter, X, ChevronDown, ChevronUp, Upload, Download, Trash, ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { ref, onValue, set, push, update, remove } from 'firebase/database';
+import { ref, set, push, update, remove } from 'firebase/database';
 import { database } from '../firebase/config';
+import { useFirebaseQuery } from '../hooks';
 import * as XLSX from 'xlsx';
 import { danh_sach_xe, carPriceData, uniqueNgoaiThatColors, uniqueNoiThatColors, getCarImageUrl } from '../data/calculatorData';
 import { parseVehicleExcel, generateImportTemplate, VEHICLE_STATUSES, STATUS_LABELS, STATUS_COLORS } from '../utils/excelParser';
 
 export default function DanhSachXePage() {
-    const [vehicles, setVehicles] = useState([]);
-    const [groupedVehicles, setGroupedVehicles] = useState([]);
-    const [filteredGroupedVehicles, setFilteredGroupedVehicles] = useState([]);
+    // Use custom Firebase hook for realtime data
+    const { data: vehicles, loading: isLoading, error } = useFirebaseQuery('vehicleInventory');
+
     const [expandedRows, setExpandedRows] = useState(new Set());
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -26,7 +27,6 @@ export default function DanhSachXePage() {
     });
     const fileInputRef = useRef(null);
     const [isImporting, setIsImporting] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [filters, setFilters] = useState({
         searchTerm: '',
         model: '',
@@ -34,44 +34,14 @@ export default function DanhSachXePage() {
         exteriorColor: '',
         status: ''
     });
-    const [stats, setStats] = useState({
-        total: 0,
-        ready: 0,
-        notArrived: 0,
-        arrived: 0,
-        matched: 0,
-        exported: 0,
-        delivered: 0,
-        byModel: {},
-        byColor: {}
-    });
 
-    // Load vehicles from Firebase (real-time listener)
+    // Handle Firebase errors
     useEffect(() => {
-        const vehiclesRef = ref(database, 'vehicleInventory');
-        const unsubscribe = onValue(
-            vehiclesRef,
-            (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    const vehiclesList = Object.entries(data).map(([id, vehicle]) => ({
-                        ...vehicle,
-                        id
-                    }));
-                    setVehicles(vehiclesList);
-                } else {
-                    setVehicles([]);
-                }
-                setIsLoading(false);
-            },
-            (error) => {
-                console.error('Firebase listener error:', error);
-                toast.error('Lỗi kết nối Firebase: ' + error.message);
-                setIsLoading(false);
-            }
-        );
-        return () => unsubscribe();
-    }, []);
+        if (error) {
+            console.error('Firebase listener error:', error);
+            toast.error('Lỗi kết nối Firebase: ' + error.message);
+        }
+    }, [error]);
 
     // Save vehicle to Firebase
     const saveVehicle = async (vehicleData) => {
@@ -147,22 +117,10 @@ export default function DanhSachXePage() {
         toast.success('Đã tải mẫu import');
     };
 
-    // Group vehicles whenever vehicles change
-    useEffect(() => {
-        groupVehiclesByConfig();
-    }, [vehicles]);
+    // Memoize grouped vehicles calculation
+    const groupedVehicles = useMemo(() => {
+        if (!vehicles || vehicles.length === 0) return [];
 
-    // Apply filters whenever grouped vehicles or filters change
-    useEffect(() => {
-        applyFilters();
-    }, [groupedVehicles, filters]);
-
-    // Calculate stats whenever filtered vehicles change
-    useEffect(() => {
-        calculateStats();
-    }, [filteredGroupedVehicles]);
-
-    const groupVehiclesByConfig = () => {
         const grouped = {};
 
         vehicles.forEach(vehicle => {
@@ -205,11 +163,11 @@ export default function DanhSachXePage() {
             grouped[key].totalQuantity += vehicle.quantity;
         });
 
-        const groupedArray = Object.values(grouped);
-        setGroupedVehicles(groupedArray);
-    };
+        return Object.values(grouped);
+    }, [vehicles]);
 
-    const applyFilters = () => {
+    // Memoize filtered vehicles based on groupedVehicles and filters
+    const filteredGroupedVehicles = useMemo(() => {
         let filtered = [...groupedVehicles];
 
         // Search term filter
@@ -266,10 +224,11 @@ export default function DanhSachXePage() {
             );
         }
 
-        setFilteredGroupedVehicles(filtered);
-    };
+        return filtered;
+    }, [groupedVehicles, filters]);
 
-    const calculateStats = () => {
+    // Memoize stats calculation
+    const stats = useMemo(() => {
         // Lấy tất cả vehicles từ filteredGroupedVehicles
         const filteredVehicles = [];
         filteredGroupedVehicles.forEach(group => {
@@ -297,8 +256,8 @@ export default function DanhSachXePage() {
             byColor[colorName] = (byColor[colorName] || 0) + v.quantity;
         });
 
-        setStats({ total, ready, notArrived, arrived, matched, exported, delivered, byModel, byColor });
-    };
+        return { total, ready, notArrived, arrived, matched, exported, delivered, byModel, byColor };
+    }, [filteredGroupedVehicles]);
 
     // Handle Excel import with batch write optimization
     const handleExcelImport = async (e) => {
