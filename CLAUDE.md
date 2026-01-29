@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-VinFast Dealer Management System - React SPA for VinFast Đông Sài Gòn dealers. Manages contracts, customers, and prints 27 legal document templates (BieuMau).
+VinFast Web Production - React SPA for VinFast Đông Sài Gòn dealers. Manages contracts, customers, and prints 27 legal document templates (BieuMau).
 
-**Live:** https://vinfast-dealer-mgmt.web.app
+**Live:** https://vinfast-web-prod.web.app
 
 ## Commands
 
@@ -14,10 +14,16 @@ VinFast Dealer Management System - React SPA for VinFast Đông Sài Gòn dealer
 npm run dev      # Start dev server at localhost:3004
 npm run build    # Production build to dist/
 npm run preview  # Preview production build
+npm test         # Run tests with Vitest
 
-# Firebase Cloud Functions
-cd functions && npm install
-firebase deploy --only functions
+# Firebase
+firebase deploy --only database    # Deploy security rules
+firebase deploy --only functions   # Deploy Cloud Functions
+firebase deploy --only hosting     # Deploy frontend
+
+# Migration scripts (require GOOGLE_APPLICATION_CREDENTIALS)
+node scripts/remove-password-hashes.js    # Remove bcrypt hashes from DB
+node scripts/reset-employee-passwords.js  # Reset all passwords to default
 ```
 
 ## Architecture
@@ -25,8 +31,13 @@ firebase deploy --only functions
 ### Data Flow
 - **Frontend State**: React useState/useEffect + Firebase Realtime listeners
 - **Backend**: Firebase Realtime Database (NoSQL) + Cloud Functions
-- **Auth**: Firebase Authentication
+- **Auth**: Custom bcrypt auth (NOT Firebase Auth) - stores hash in `employees/{id}/pass`
 - **Navigation State**: React Router `useLocation().state` passes contract data to BieuMau
+
+### Security Rules (`database.rules.json`)
+- Currently open (no auth required) because app uses custom auth, not Firebase Auth
+- To enable proper security, need to migrate Login to Firebase Authentication
+- Admin UID for future use: `zeA0Ompcg9MLQF95GOkyEL0bsEl2`
 
 ### Firebase Database Structure
 ```
@@ -34,8 +45,10 @@ firebase deploy --only functions
 /exportedContracts/{id}   # Finalized contracts
 /vsoCounters/{key}        # Atomic VSO sequence counters (key: S00901-25-12)
 /promotions/{id}          # Active vehicle promotions
-/employees/{id}           # Employee directory
+/employees/{id}           # Employee directory (includes pass field for auth)
 /customers/{id}           # Customer database
+/vehicleInventory/{id}    # Vehicle stock (~222 records)
+/dailySummaries/{date}    # Auto-generated daily stats (Cloud Function)
 ```
 
 ### Key Modules
@@ -99,6 +112,7 @@ VITE_FIREBASE_DATABASE_URL
 VITE_FIREBASE_STORAGE_BUCKET
 VITE_FIREBASE_MESSAGING_SENDER_ID
 VITE_FIREBASE_APP_ID
+GOOGLE_APPLICATION_CREDENTIALS
 ```
 
 ## Documentation
