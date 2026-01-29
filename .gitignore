@@ -34,9 +34,20 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 
-# Firebase Service Account Key (SENSITIVE - DO NOT COMMIT!)
+# Firebase Service Account Key & Credentials (SENSITIVE - DO NOT COMMIT!)
 functions/service-account-key.json
 **/service-account-key.json
+*-firebase-adminsdk-*.json
+*.p12
+*.pem
+service-account*.json
+firebase-adminsdk*.json
+*-adminsdk-*.json
+
+# Google Cloud credentials
+gcloud-*.json
+credentials*.json
+!credentials.example.json
 
 #Documents
 /plans
