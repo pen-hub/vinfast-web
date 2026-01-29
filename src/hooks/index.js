@@ -1,4 +1,13 @@
 /**
+ * Firebase Data Hooks
+ *
+ * Custom hooks for Firebase realtime database queries
+ */
+
+export { useFirebaseQuery } from './use-firebase-query';
+export { useFirebaseDocument } from './use-firebase-document';
+
+/**
  * Calculator Custom Hooks
  *
  * These hooks extract state management logic from CalculatorPage
