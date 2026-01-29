@@ -8,6 +8,26 @@ import VinfastLogo from "../assets/vinfast.svg";
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Session expiry check (24h)
+  const SESSION_DURATION = 24 * 60 * 60 * 1000;
+  const sessionTimestamp = localStorage.getItem("sessionTimestamp");
+
+  if (sessionTimestamp && Date.now() - parseInt(sessionTimestamp) > SESSION_DURATION) {
+    // Session expired, clear and redirect
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userTeam");
+    localStorage.removeItem("userDepartment");
+    localStorage.removeItem("sessionTimestamp");
+    if (location.pathname !== "/dang-nhap") {
+      navigate("/dang-nhap");
+    }
+  }
+
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
   const username = localStorage.getItem("username") || "User";
   const userRole = localStorage.getItem("userRole") || "user";
@@ -117,6 +137,8 @@ export default function Header() {
     localStorage.removeItem("userRole");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userTeam");
+    localStorage.removeItem("userDepartment");
+    localStorage.removeItem("sessionTimestamp");
     navigate("/dang-nhap");
   };
 

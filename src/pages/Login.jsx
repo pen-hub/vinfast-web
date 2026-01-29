@@ -49,10 +49,22 @@ function Login() {
             setLoading(false);
             return;
           }
-          
-          // So sánh mật khẩu đã hash
-          const passwordMatch = bcrypt.compareSync(password, storedHash);
-          
+
+          // So sánh mật khẩu đã hash với try-catch để tránh crash khi hash corrupt
+          let passwordMatch = false;
+          try {
+            passwordMatch = bcrypt.compareSync(password, storedHash);
+          } catch (err) {
+            console.error('Bcrypt error:', err);
+            setError('Lỗi xác thực. Vui lòng liên hệ admin.');
+            toast.error('Lỗi xác thực. Vui lòng liên hệ admin.', {
+              position: "top-right",
+              autoClose: 5000,
+            });
+            setLoading(false);
+            return;
+          }
+
           if (passwordMatch) {
             // Lưu thông tin đăng nhập vào localStorage
             localStorage.setItem('isAuthenticated', 'true');
@@ -61,6 +73,7 @@ function Login() {
             localStorage.setItem('userRole', userData.quyen || userData['Quyền'] || userData.role || 'user');
             localStorage.setItem('userEmail', userData.mail || userData.Mail || userData.email || '');
             localStorage.setItem('userDepartment', userData.phongBan || userData['Phòng Ban'] || userData.department || userData['Bộ phận'] || '');
+            localStorage.setItem('sessionTimestamp', Date.now().toString());
 
             toast.success('Đăng nhập thành công!', {
               position: "top-right",
