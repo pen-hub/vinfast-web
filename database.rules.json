@@ -4,23 +4,121 @@
     ".write": false,
 
     "contracts": {
-      ".read": true,
-      ".write": true
+      "$contractId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['customerName'])",
+
+        "soTienCoc": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "giaHD": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "giamGia": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "soTienVay": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "deposit": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "contractPrice": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "loanAmount": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "soTienPhaiThu": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "tienDoiUng": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Tiền đối ứng": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "thanhToan": {
+          ".validate": "newData.isString() && (newData.val() === 'trả góp' || newData.val() === 'trả thẳng')"
+        },
+        "payment": {
+          ".validate": "newData.isString() && (newData.val() === 'trả góp' || newData.val() === 'trả thẳng')"
+        },
+        "trangThai": {
+          ".validate": "newData.isString() && (newData.val() === 'mới' || newData.val() === 'xuất' || newData.val() === 'hủy' || newData.val() === 'hoàn thành' || newData.val() === 'hoàn' || newData.val() === 'chuyển tên')"
+        },
+        "status": {
+          ".validate": "newData.isString() && (newData.val() === 'mới' || newData.val() === 'xuất' || newData.val() === 'hủy' || newData.val() === 'hoàn thành' || newData.val() === 'hoàn' || newData.val() === 'chuyển tên')"
+        }
+      },
+      ".indexOn": ["trangThai", "tvbh", "dongXe", "createdDate", "showroom"]
     },
 
     "exportedContracts": {
-      ".read": true,
-      ".write": true
+      "$contractId": {
+        ".read": true,
+        ".write": true,
+
+        "soTienCoc": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "giaHD": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "giamGia": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "soTienVay": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Giá Hợp Đồng": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Giá Niêm Yết": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Giá Giảm": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Tiền đặt cọc": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Tiền đối ứng": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "tienDatCoc": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "tienDoiUng": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Số tiền vay": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "Số tiền phải thu": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "soTienPhaiThu": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "thanhToan": {
+          ".validate": "newData.isString() && (newData.val() === 'trả góp' || newData.val() === 'trả thẳng')"
+        }
+      },
+      ".indexOn": ["Trạng thái", "tvbh", "Dòng xe", "ngayXhd"]
     },
 
     "customers": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      ".indexOn": ["tvbh", "tinhTrang", "dongXe", "ngay", "mucDo"]
     },
 
     "employees": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      ".indexOn": ["phongBan", "tinhTrang", "quyen"]
     },
 
     "users": {
@@ -29,13 +127,21 @@
     },
 
     "vehicleInventory": {
-      ".read": true,
-      ".write": true
+      "$vehicleId": {
+        ".read": true,
+        ".write": true,
+
+        "stock_status": {
+          ".validate": "newData.isString() && (newData.val().toLowerCase() === 'đã có kh' || newData.val().toLowerCase() === 'còn hàng' || newData.val().toLowerCase() === 'đang vận chuyển' || newData.val().toLowerCase() === 'đã bán')"
+        }
+      },
+      ".indexOn": ["model", "stock_status", "showroom", "created_at"]
     },
 
     "promotions": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      ".indexOn": ["createdAt", "dongXe"]
     },
 
     "vsoCounters": {
