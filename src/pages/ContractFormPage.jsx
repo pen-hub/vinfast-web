@@ -1458,43 +1458,45 @@ export default function ContractFormPage() {
                   </div>
                 )}
 
-                {/* Bank */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                    Ngân hàng
-                  </label>
-                  <select
-                    value={contract.bank || ""}
-                    onChange={(e) => handleInputChange("bank", e.target.value)}
-                    disabled={isDetailsMode}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-xs sm:text-sm bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  >
-                    <option value="">Chọn ngân hàng</option>
-                    <option value="BIDV">BIDV</option>
-                    <option value="Vietcombank">Vietcombank</option>
-                    <option value="VietinBank">VietinBank</option>
-                    <option value="Techcombank">Techcombank (TCB)</option>
-                    <option value="MB Bank">MB Bank</option>
-                    <option value="ACB">ACB</option>
-                    <option value="VPBank">VPBank</option>
-                    <option value="Sacombank">Sacombank</option>
-                    <option value="TPBank">TPBank</option>
-                    <option value="Shinhan Bank">Shinhan Bank</option>
-                    <option value="HDBank">HDBank</option>
-                    <option value="MSB">MSB</option>
-                    <option value="SHB">SHB</option>
-                    <option value="OCB">OCB</option>
-                    <option value="LPBank">LPBank</option>
-                    <option value="Agribank">Agribank</option>
-                    <option value="Khác">Khác</option>
-                    {/* Show current value if it doesn't match any option */}
-                    {contract.bank && !["", "BIDV", "Vietcombank", "VietinBank", "Techcombank", "MB Bank", "ACB", "VPBank", "Sacombank", "TPBank", "Shinhan Bank", "HDBank", "MSB", "SHB", "OCB", "LPBank", "Agribank", "Khác"].includes(contract.bank) && (
-                      <option value={contract.bank}>
-                        {contract.bank} (giá trị hiện tại)
-                      </option>
-                    )}
-                  </select>
-                </div>
+                {/* Bank - Only show when payment is "trả góp" */}
+                {contract.payment === "trả góp" && (
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                      Ngân hàng
+                    </label>
+                    <select
+                      value={contract.bank || ""}
+                      onChange={(e) => handleInputChange("bank", e.target.value)}
+                      disabled={isDetailsMode}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-xs sm:text-sm bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">Chọn ngân hàng</option>
+                      <option value="BIDV">BIDV</option>
+                      <option value="Vietcombank">Vietcombank</option>
+                      <option value="VietinBank">VietinBank</option>
+                      <option value="Techcombank">Techcombank (TCB)</option>
+                      <option value="MB Bank">MB Bank</option>
+                      <option value="ACB">ACB</option>
+                      <option value="VPBank">VPBank</option>
+                      <option value="Sacombank">Sacombank</option>
+                      <option value="TPBank">TPBank</option>
+                      <option value="Shinhan Bank">Shinhan Bank</option>
+                      <option value="HDBank">HDBank</option>
+                      <option value="MSB">MSB</option>
+                      <option value="SHB">SHB</option>
+                      <option value="OCB">OCB</option>
+                      <option value="LPBank">LPBank</option>
+                      <option value="Agribank">Agribank</option>
+                      <option value="Khác">Khác</option>
+                      {/* Show current value if it doesn't match any option */}
+                      {contract.bank && !["", "BIDV", "Vietcombank", "VietinBank", "Techcombank", "MB Bank", "ACB", "VPBank", "Sacombank", "TPBank", "Shinhan Bank", "HDBank", "MSB", "SHB", "OCB", "LPBank", "Agribank", "Khác"].includes(contract.bank) && (
+                        <option value={contract.bank}>
+                          {contract.bank} (giá trị hiện tại)
+                        </option>
+                      )}
+                    </select>
+                  </div>
+                )}
 
                 {/* Uu Dai - Dropdown with checkboxes */}
                 <div>
@@ -1585,20 +1587,6 @@ export default function ContractFormPage() {
                     disabled={isDetailsMode}
                     className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-xs sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                     placeholder="Bảo Hiểm Vật Chất Kinh Doanh, Cam, Film, Sàn"
-                  />
-                </div>
-
-                {/* Số tiền vay */}
-                <div className="sm:col-span-2 lg:col-span-1">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                    Số tiền vay
-                  </label>
-                  <CurrencyInput
-                    value={contract.soTienVay}
-                    onChange={(val) => handleInputChange("soTienVay", val)}
-                    disabled={isDetailsMode}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-xs sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    placeholder="Nhập số tiền vay"
                   />
                 </div>
 
