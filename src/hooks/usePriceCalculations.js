@@ -61,7 +61,10 @@ export function usePriceCalculations({
   calculatePromotionDiscounts,
 }) {
   const calculations = useMemo(() => {
-    const basePrice = getCarPrice();
+    const rawBasePrice = getCarPrice();
+    const basePrice = (typeof rawBasePrice === 'number' && Number.isFinite(rawBasePrice) && rawBasePrice >= 0)
+      ? rawBasePrice
+      : 0;
 
     // Discounts
     const discount2Potential = discount2 ? 50000000 : 0;
@@ -104,7 +107,13 @@ export function usePriceCalculations({
     const legacyPromotionDiscount = discount2Potential + discount3Potential;
 
     // Calculate promotion discounts
-    const promotionDiscounts = calculatePromotionDiscounts(basePrice);
+    let promotionDiscounts = 0;
+    try {
+      const result = calculatePromotionDiscounts(basePrice);
+      promotionDiscounts = (typeof result === 'number' && Number.isFinite(result)) ? result : 0;
+    } catch {
+      promotionDiscounts = 0;
+    }
 
     // Total promotion discounts
     const rawTotalDiscount = (promotionDiscounts || 0) + (legacyPromotionDiscount || 0);

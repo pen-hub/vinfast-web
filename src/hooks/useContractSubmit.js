@@ -1,4 +1,4 @@
-import { ref, update, push, set, remove } from 'firebase/database';
+import { ref, update, push, set } from 'firebase/database';
 import { database } from '../firebase/config';
 import { toast } from 'react-toastify';
 import { validateRequiredFields, isValidCCCD, isValidPhone } from '../utils/validation';
@@ -111,11 +111,13 @@ export function useContractSubmit(navigate) {
 
         // Sanitize data before Firebase write
         const sanitizedUpdateData = sanitizeContractData(updateData);
-        await update(contractRef, sanitizedUpdateData);
+
+        // Use multi-path atomic update for contracts and exportedContracts
+        const updates = {};
+        updates[`contracts/${contractData.firebaseKey}`] = sanitizedUpdateData;
 
         // Sync with exportedContracts based on status change
         const exportKey = contractData.firebaseKey;
-        const exportedContractRef = ref(database, `exportedContracts/${exportKey}`);
 
         // If changing from non-"xuất" to "xuất": add to exportedContracts
         if (oldStatusLower !== "xuất" && newStatusLower === "xuất") {
@@ -170,17 +172,20 @@ export function useContractSubmit(navigate) {
           };
 
           const sanitizedExportedData = sanitizeContractData(exportedData);
-          await set(exportedContractRef, sanitizedExportedData);
+          updates[`exportedContracts/${exportKey}`] = sanitizedExportedData;
         }
         // If changing from "xuất" to non-"xuất": remove from exportedContracts
         else if (oldStatusLower === "xuất" && newStatusLower !== "xuất") {
-          await remove(exportedContractRef);
+          updates[`exportedContracts/${exportKey}`] = null;
         }
+
+        // Execute atomic multi-path update
+        await update(ref(database), updates);
 
         toast.success("Cập nhật hợp đồng thành công!");
       } else {
-        // Create new contract
-        const id = `local-${Date.now()}`;
+        // Create new contract with collision-resistant ID
+        const id = `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         const contractsRef = ref(database, "contracts");
         const newContractData = {
           id: id || "",

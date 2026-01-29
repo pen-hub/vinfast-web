@@ -120,7 +120,8 @@ export const previewNextVSO = async (maDms) => {
   try {
     const snapshot = await get(counterRef);
     const currentValue = snapshot.exists() ? snapshot.val() : 0;
-    const nextSequence = String(currentValue + 1).padStart(4, '0');
+    const padLength = (currentValue + 1) > MAX_SEQUENCE ? 5 : 4;
+    const nextSequence = String(currentValue + 1).padStart(padLength, '0');
     return `${maDms}-VSO-${year}-${month}-${nextSequence}`;
   } catch (error) {
     console.error('Error previewing VSO:', error);
@@ -130,14 +131,14 @@ export const previewNextVSO = async (maDms) => {
 
 /**
  * Check if a VSO string has the full format
- * 
+ *
  * @param {string} vso - VSO string to check
  * @returns {boolean} True if VSO has full format
  */
 export const isFullVSOFormat = (vso) => {
   if (!vso) return false;
-  // Pattern: S00901-VSO-25-12-0035
-  const pattern = /^S\d{5}-VSO-\d{2}-\d{2}-\d{4}$/;
+  // Pattern: S00901-VSO-25-12-0035 or S00901-VSO-25-12-10001
+  const pattern = /^S\d{5}-VSO-\d{2}-\d{2}-\d{4,5}$/;
   return pattern.test(vso);
 };
 

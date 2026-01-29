@@ -13,8 +13,8 @@ const CCCD_REGEX = /^\d{12}$/;
 /** Vietnamese phone: (0|+84)(3|5|7|8|9)XXXXXXXX */
 const VN_PHONE_REGEX = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
 
-/** VSO format: S00XXX-VSO-YY-MM-NNNN */
-const VSO_REGEX = /^S\d{5}-VSO-\d{2}-\d{2}-\d{4}$/;
+/** VSO format: S00XXX-VSO-YY-MM-NNNN or S00XXX-VSO-YY-MM-NNNNN */
+const VSO_REGEX = /^S\d{5}-VSO-\d{2}-\d{2}-\d{4,5}$/;
 
 /** maDms format: S followed by 5 digits */
 const MA_DMS_REGEX = /^S\d{5}$/;

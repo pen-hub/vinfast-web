@@ -24,7 +24,7 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
  * @param {number} maxRetries - Maximum number of retry attempts
  * @return {Promise} Result of the function call
  */
-async function retryWithBackoff(fn, maxRetries = 3) {
+async function retryWithBackoff(fn, maxRetries = 5) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn();
@@ -34,7 +34,7 @@ async function retryWithBackoff(fn, maxRetries = 3) {
         error.message?.includes("quota");
 
       if (isRateLimitError && i < maxRetries - 1) {
-        const delayMs = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+        const delayMs = Math.pow(2, i) * 2000; // 2s, 4s, 8s, 16s, 32s
         console.log(`Rate limit hit, retrying in ${delayMs}ms (attempt ${i + 1}/${maxRetries})...`);
         await new Promise((r) => setTimeout(r, delayMs));
         continue;
@@ -127,7 +127,7 @@ exports.onContractExported = onValueCreated(
       const sheets = await getGoogleSheetsClient();
       const row = formatContractRow(contract, contractId);
 
-      await retryWithBackoff(async () => {
+      const response = await retryWithBackoff(async () => {
         return await sheets.spreadsheets.values.append({
           spreadsheetId: sheetId,
           range: "HopDongDaXuat!A:X",
@@ -137,6 +137,18 @@ exports.onContractExported = onValueCreated(
           },
         });
       });
+
+      // Store row index for O(1) lookup later
+      const updatedRange = response.data.updates?.updatedRange;
+      if (updatedRange) {
+        // Extract row number from range like "HopDongDaXuat!A123:X123"
+        const rowMatch = updatedRange.match(/!A(\d+)/);
+        if (rowMatch) {
+          const rowIndex = parseInt(rowMatch[1], 10);
+          const db = getDatabase();
+          await db.ref(`sheetRowIndex/${contractId}`).set(rowIndex);
+        }
+      }
 
       console.log(`Contract ${contractId} synced to Google Sheets`);
       return {success: true, contractId};
@@ -176,22 +188,29 @@ exports.onContractUpdated = onValueUpdated(
       }
 
       const sheets = await getGoogleSheetsClient();
+      const db = getDatabase();
 
-      // Find and update the row in Google Sheets
-      const response = await retryWithBackoff(async () => {
-        return await sheets.spreadsheets.values.get({
-          spreadsheetId: sheetId,
-          range: "HopDongDaXuat!W:W", // Column W contains contractId
+      // Check stored row index first
+      const storedRowSnapshot = await db.ref(`sheetRowIndex/${contractId}`).once("value");
+      let rowIndex = storedRowSnapshot.exists() ? storedRowSnapshot.val() : -1;
+
+      // Fallback to search only if no stored index
+      if (rowIndex < 1) {
+        const response = await retryWithBackoff(async () => {
+          return await sheets.spreadsheets.values.get({
+            spreadsheetId: sheetId,
+            range: "HopDongDaXuat!W:W", // Column W contains contractId
+          });
         });
-      });
 
-      const rows = response.data.values || [];
-      let rowIndex = -1;
-
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i][0] === contractId) {
-          rowIndex = i + 1; // Sheets is 1-indexed
-          break;
+        const rows = response.data.values || [];
+        for (let i = 0; i < rows.length; i++) {
+          if (rows[i][0] === contractId) {
+            rowIndex = i + 1; // Sheets is 1-indexed
+            // Store for future
+            await db.ref(`sheetRowIndex/${contractId}`).set(rowIndex);
+            break;
+          }
         }
       }
 

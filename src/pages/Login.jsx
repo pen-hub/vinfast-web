@@ -12,12 +12,26 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remainingSeconds = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      const errorMsg = `Tài khoản tạm khóa. Vui lòng thử lại sau ${remainingSeconds} giây`;
+      setError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       // Lấy danh sách employees từ Firebase
@@ -66,6 +80,9 @@ function Login() {
           }
 
           if (passwordMatch) {
+            setFailedAttempts(0);
+            setLockoutUntil(null);
+
             // Lưu thông tin đăng nhập vào localStorage
             localStorage.setItem('isAuthenticated', 'true');
             localStorage.setItem('userId', userId);
@@ -85,13 +102,27 @@ function Login() {
               navigate('/trang-chu');
             }, 2000);
           } else {
-            setError('Email hoặc mật khẩu không đúng!');
-            toast.error('Email hoặc mật khẩu không đúng!', {
-              position: "top-right",
-              autoClose: 4000,
-            });
+            const newAttempts = failedAttempts + 1;
+            setFailedAttempts(newAttempts);
+
+            if (newAttempts >= 5) {
+              setLockoutUntil(Date.now() + 5 * 60 * 1000);
+              const errorMsg = 'Đã nhập sai quá 5 lần. Tài khoản tạm khóa 5 phút';
+              setError(errorMsg);
+              toast.error(errorMsg, {
+                position: "top-right",
+                autoClose: 5000,
+              });
+            } else {
+              setError('Email hoặc mật khẩu không đúng!');
+              toast.error('Email hoặc mật khẩu không đúng!', {
+                position: "top-right",
+                autoClose: 4000,
+              });
+            }
           }
         } else {
+          bcrypt.compareSync('dummy', '$2a$10$abcdefghijklmnopqrstuv');
           setError('Email hoặc mật khẩu không đúng!');
           toast.error('Email hoặc mật khẩu không đúng!', {
             position: "top-right",

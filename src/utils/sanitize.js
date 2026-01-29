@@ -39,7 +39,15 @@ export const sanitizeNumber = (value) => {
 export const sanitizeContractData = (data) => {
   if (!data || typeof data !== 'object') return {};
 
-  const sanitized = { ...data };
+  // Block prototype pollution
+  const DANGEROUS_KEYS = ['__proto__', 'constructor', 'prototype'];
+
+  const sanitized = {};
+  for (const key of Object.keys(data)) {
+    if (!DANGEROUS_KEYS.includes(key)) {
+      sanitized[key] = data[key];
+    }
+  }
 
   // String fields to sanitize
   const stringFields = [
@@ -83,6 +91,13 @@ export const sanitizeContractData = (data) => {
       sanitized[field] = sanitizeNumber(sanitized[field]);
     }
   });
+
+  // Sanitize array fields
+  if ('uuDai' in sanitized && Array.isArray(sanitized.uuDai)) {
+    sanitized.uuDai = sanitized.uuDai
+      .filter(item => typeof item === 'string')
+      .map(item => sanitizeString(item, 500));
+  }
 
   return sanitized;
 };

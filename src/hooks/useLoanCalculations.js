@@ -15,14 +15,17 @@ export function useLoanCalculations(totalCost = 0, giaXuatHoaDon = 0) {
   const [customInterestRate, setCustomInterestRate] = useState('');
 
   const loanData = useMemo(() => {
-    if (!loanToggle || totalCost <= 0) {
+    const safeTotalCost = (typeof totalCost === 'number' && Number.isFinite(totalCost) && totalCost >= 0) ? totalCost : 0;
+    const safeGiaXuatHoaDon = (typeof giaXuatHoaDon === 'number' && Number.isFinite(giaXuatHoaDon) && giaXuatHoaDon >= 0) ? giaXuatHoaDon : 0;
+
+    if (!loanToggle || safeTotalCost <= 0) {
       return {
         downPayment: 0,
         loanAmount: 0,
         totalInterest: 0,
         monthlyPayment: 0,
         tienVayTuGiaXHD: 0,
-        soTienThanhToanDoiUng: giaXuatHoaDon,
+        soTienThanhToanDoiUng: safeGiaXuatHoaDon,
       };
     }
 
@@ -34,8 +37,8 @@ export function useLoanCalculations(totalCost = 0, giaXuatHoaDon = 0) {
     const monthlyRate = annualRate / 12;
 
     // Calculate loan amount based on total cost
-    const loanAmount = Math.round(totalCost * loanRatioDecimal);
-    const downPayment = totalCost - loanAmount;
+    const loanAmount = Math.round(safeTotalCost * loanRatioDecimal);
+    const downPayment = safeTotalCost - loanAmount;
 
     // Calculate monthly payment using annuity formula
     let monthlyPayment = 0;
@@ -52,8 +55,8 @@ export function useLoanCalculations(totalCost = 0, giaXuatHoaDon = 0) {
     const totalInterest = totalPayment - loanAmount;
 
     // Số tiền thanh toán đối ứng = Giá XHD - Tiền vay (dựa trên Giá XHD)
-    const tienVayTuGiaXHD = Math.round(giaXuatHoaDon * loanRatioDecimal);
-    const soTienThanhToanDoiUng = Math.max(0, giaXuatHoaDon - tienVayTuGiaXHD);
+    const tienVayTuGiaXHD = Math.round(safeGiaXuatHoaDon * loanRatioDecimal);
+    const soTienThanhToanDoiUng = Math.max(0, safeGiaXuatHoaDon - tienVayTuGiaXHD);
 
     return {
       downPayment: Math.round(downPayment),
