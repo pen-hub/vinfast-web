@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -977,6 +977,15 @@ const HopDongMuaBanXe = () => {
                   https://vinfastauto.com
                 </a> ("
                 <strong>Website</strong>").
+              </p>
+              <p className="text-left leading-relaxed">
+                Với dòng xe VF3, VF 7, VF 8, VF 9, VF MPV7 Khách Hàng cam kết
+                rằng, để hưởng ưu đãi miễn phí sạc pin theo chính sách (nếu có),
+                Khách Hàng sẽ không sử dụng xe cho mục đích kinh doanh dịch vụ
+                dưới bất kỳ hình thức nào (bao gồm nhưng không giới hạn: cho thuê
+                xe để cung cấp dịch vụ vận tải, vận tải hành khách hoặc hàng hóa
+                có thu phí (không hoặc có sử dụng công nghệ) hoặc các hoạt động
+                tương tự…).
               </p>
               <p className="text-left leading-relaxed">
                 Trường hợp Khách Hàng chậm trễ thanh toán/nhận Xe hoặc vi phạm
