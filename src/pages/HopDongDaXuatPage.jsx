@@ -299,7 +299,7 @@ export default function HopDongDaXuatPage() {
       ngayXhd: c["ngày xhd"] || "",
       tvbh: c.tvbh || "",
       showroom: c.showroom || c.Showroom || c["Showroom"] || "",
-      vso: c.VSO || "",
+      vso: c.vso || c.VSO || "",
       tenKh: c["Tên Kh"] || "",
       soDienThoai: c["Số Điện Thoại"] || "",
       email: c.Email || "",
